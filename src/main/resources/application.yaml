@@ -1,7 +1,11 @@
+server:
+  servlet:
+    context-path: /api
 spring:
   application:
      name: app
   profiles:
      active: dev
+
   jpa:
     open-in-view: false

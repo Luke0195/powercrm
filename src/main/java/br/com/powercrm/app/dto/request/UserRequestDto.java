@@ -1,6 +1,7 @@
 package br.com.powercrm.app.dto.request;
 
 import br.com.powercrm.app.domain.enums.UserStatus;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import org.hibernate.validator.constraints.br.CPF;
@@ -15,6 +16,7 @@ public record UserRequestDto(
         @NotEmpty(message = "The field cpf must be required")
         @CPF(message = "Please provided a valid cpf")
         String cpf,
+        @JsonProperty("zip_code")
         String zipCode,
         String address,
         Integer number,
