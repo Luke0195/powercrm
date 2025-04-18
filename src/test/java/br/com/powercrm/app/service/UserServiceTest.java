@@ -28,15 +28,18 @@ class UserServiceTest {
 
     private UserRequestDto userRequestDto;
 
+    private User user;
+
     @BeforeEach
     void setup(){
         this.userRequestDto = UserFactory.makeUserRequestDto();
+        this.user = UserFactory.makeUser(this.userRequestDto);
     }
 
     @DisplayName("Add should throws EntityAlreadyExistsException when email already exists")
     @Test
     void addShouldThrowsEntityAlreadyExistsExceptionWhenEmailAlreadyExists(){
-        Mockito.when(userRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.of(UserFactory.makeUser(userRequestDto)));
+        Mockito.when(userRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.of(user));
         Assertions.assertThrows(EntityAlreadyExistsException.class, () -> {
             User user = UserFactory.makeUser(userRequestDto);
             userService.add(user);
@@ -46,10 +49,13 @@ class UserServiceTest {
     @DisplayName("Add should throws EntityAlreadyExistsException when cpf already exists")
     @Test
     void addShouldThrowsEntityAlreadyExistsExceptionWhenCpfAlreadyExists(){
-        Mockito.when(userRepository.findByCpf(Mockito.any())).thenReturn(Optional.of(UserFactory.makeUser(userRequestDto)));
+        Mockito.when(userRepository.findByCpf(Mockito.any())).thenReturn(Optional.of(user));
         Assertions.assertThrows(EntityAlreadyExistsException.class, () -> {
             User user = UserFactory.makeUser(userRequestDto);
             userService.add(user);
         });
     }
+
+
+
 }
