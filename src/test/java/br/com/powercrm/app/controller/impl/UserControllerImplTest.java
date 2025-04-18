@@ -132,4 +132,5 @@ class UserControllerImplTest {
         );
         resultActions.andExpect(MockMvcResultMatchers.status().isOk());
     }
+
 }

@@ -18,6 +18,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -79,6 +81,22 @@ class UserServiceTest {
         Assertions.assertEquals("any_name", userResponseDto.name());
         Assertions.assertEquals("any_mail@mail.com", userResponseDto.email());
         Assertions.assertEquals("640.290.140-70", userResponseDto.cpf());
+    }
+
+    @DisplayName("loadUsers should returns an empty list when no data was found")
+    @Test
+    void loadUsersShouldReturnsAnEmptyListWhenNoDataIsFound(){
+        Mockito.when(userRepository.findAll()).thenReturn(Collections.emptyList());
+        List<UserResponseDto> userResponseDtoList = userService.loadUsers();
+        Assertions.assertEquals(0, userResponseDtoList.size());
+    }
+
+    @DisplayName("loadUsers should returns an list of users when was data")
+    @Test
+    void loadUsersShouldReturnsAUserListWhenWasData(){
+        Mockito.when(userRepository.findAll()).thenReturn(List.of(user));
+        List<UserResponseDto> userResponseDtoList = userService.loadUsers();
+        Assertions.assertEquals(1, userResponseDtoList.size());
     }
 
 }
