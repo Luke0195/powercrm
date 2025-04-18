@@ -48,7 +48,7 @@ class UserControllerImplTest {
     @DisplayName("POST - handleAddUser should returns 400 if no email is provided")
     @Test
     void handleAddUserShouldReturnsBadRequestWhenNoEmailIsProvided() throws Exception{
-        UserRequestDto userRequestDto = new UserRequestDto("any_name", null, "any_phone", "111.111.111.11",
+        UserRequestDto userRequestDto = new UserRequestDto("any_name", null, "any_phone", "401.729.130-98",
                 "any_zipcode", "any_address", 30, "any_complement", UserStatus.ACTIVE);
         String jsonBody = objectMapper.writeValueAsString(userRequestDto);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/user")
@@ -59,5 +59,17 @@ class UserControllerImplTest {
         resultActions.andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
-
+    @DisplayName("POST - handleAddUser should returns 400 if an invalid e-mail is provided")
+    @Test
+    void handleAddUserShouldReturnsBadRequestWhenAnInvalidEmailIsProvided() throws Exception{
+        UserRequestDto userRequestDto = new UserRequestDto("any_name", "any_mail", "any_phone",
+                "401.729.130-98", "any_code", "any_addres", 30, "any_complement", UserStatus.ACTIVE);
+        String jsonBody = objectMapper.writeValueAsString(userRequestDto);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/user")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonBody)
+        );
+        resultActions.andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
 }
