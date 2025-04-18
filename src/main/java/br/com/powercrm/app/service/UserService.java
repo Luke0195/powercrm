@@ -20,7 +20,6 @@ public class UserService implements AddUser {
 
     private final UserRepository userRepository;
 
-
     @Override
     @Transactional
     public UserResponseDto add(UserRequestDto userRequestDto) {
