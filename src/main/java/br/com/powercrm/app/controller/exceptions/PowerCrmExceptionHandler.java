@@ -2,6 +2,8 @@ package br.com.powercrm.app.controller.exceptions;
 
 import br.com.powercrm.app.dto.response.FieldErrorResponseDto;
 import br.com.powercrm.app.dto.response.StandardErrorResponseDto;
+import br.com.powercrm.app.service.exceptions.EntityAlreadyExistsException;
+import br.com.powercrm.app.utils.http.HttpHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,17 +22,38 @@ public class PowerCrmExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<StandardErrorResponseDto> handleValidationException(MethodArgumentNotValidException e,
                                                                               HttpServletRequest httpServletRequest){
-    Set<FieldErrorResponseDto> errors = new HashSet<>();
-     e.getFieldErrors().forEach(error -> {
-         String fieldName = error.getField();
-         String description = error.getDefaultMessage();
-         errors.add(new FieldErrorResponseDto(fieldName, description));
-     });
-    String pathUrl = httpServletRequest.getRequestURI();
-    int badRequestStatusCode = HttpStatus.BAD_REQUEST.value();
-    StandardErrorResponseDto standardErrorResponseDto = new StandardErrorResponseDto(LocalDateTime.now(),
-            badRequestStatusCode, pathUrl, "Hibernate Validation Exception",
-            "Please validate the errors_field to validate the payload", errors);
-    return ResponseEntity.status(badRequestStatusCode).body(standardErrorResponseDto);
+    Set<FieldErrorResponseDto> errors = getErrorsFromValidation(e);
+    StandardErrorResponseDto standardErrorResponseDto = makeStandardErrorResponseDto(
+            HttpHelper.getStatusCodeValue(HttpStatus.BAD_REQUEST),  HttpHelper.getPathUrlFromRequest(httpServletRequest),
+            "Hibernate Validation Exception", "Please validate the errors_field to validate the payload",
+            errors);
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(standardErrorResponseDto);
+    }
+
+
+    @ExceptionHandler(EntityAlreadyExistsException.class)
+    public ResponseEntity<StandardErrorResponseDto> handleEntityAlreadyExistsException(
+            EntityAlreadyExistsException exception, HttpServletRequest httpServletRequest){
+        StandardErrorResponseDto standardErrorResponseDto = makeStandardErrorResponseDto(
+                HttpHelper.getStatusCodeValue(HttpStatus.UNPROCESSABLE_ENTITY), HttpHelper.getPathUrlFromRequest(httpServletRequest),
+                "Entity already exists exception", exception.getMessage(), new HashSet<>());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(standardErrorResponseDto);
+    }
+
+
+    private static Set<FieldErrorResponseDto> getErrorsFromValidation(MethodArgumentNotValidException e){
+        Set<FieldErrorResponseDto> errors = new HashSet<>();
+        e.getFieldErrors().forEach(error -> {
+            String fieldName = error.getField();
+            String description = error.getDefaultMessage();
+            errors.add(new FieldErrorResponseDto(fieldName, description));
+        });
+        return errors;
+    }
+
+    private static StandardErrorResponseDto makeStandardErrorResponseDto(
+            int statusCode, String pathUrl, String exception,
+            String message, Set<FieldErrorResponseDto> errors){
+        return new StandardErrorResponseDto(LocalDateTime.now(), statusCode, pathUrl, exception, message, errors);
     }
 }
