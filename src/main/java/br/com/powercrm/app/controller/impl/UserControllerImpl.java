@@ -6,8 +6,10 @@ import br.com.powercrm.app.dto.response.UserResponseDto;
 import br.com.powercrm.app.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
 
 
+@RestController
 @RequiredArgsConstructor
 public class UserControllerImpl implements UserController {
 
