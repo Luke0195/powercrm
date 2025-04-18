@@ -1,6 +1,7 @@
 package br.com.powercrm.app.controller.impl;
 
 
+import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.domain.enums.UserStatus;
 import br.com.powercrm.app.dto.request.UserRequestDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,7 +31,7 @@ class UserControllerImplTest {
     private UserRequestDto userRequestDto;
 
 
-    @DisplayName("POST - should returns 400 if no name is provided")
+    @DisplayName("POST - handleAddUser should returns 400 if no name is provided")
     @Test
     void handleAddUserShouldReturnsBadRequestWhenNoNameIsProvided() throws Exception{
         UserRequestDto userRequestDto = new UserRequestDto(
@@ -43,4 +44,20 @@ class UserControllerImplTest {
                 .content(jsonBody));
         resultActions.andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
+
+    @DisplayName("POST - handleAddUser should returns 400 if no email is provided")
+    @Test
+    void handleAddUserShouldReturnsBadRequestWhenNoEmailIsProvided() throws Exception{
+        UserRequestDto userRequestDto = new UserRequestDto("any_name", null, "any_phone", "111.111.111.11",
+                "any_zipcode", "any_address", 30, "any_complement", UserStatus.ACTIVE);
+        String jsonBody = objectMapper.writeValueAsString(userRequestDto);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/user")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonBody)
+        );
+        resultActions.andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+
 }
