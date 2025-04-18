@@ -1,10 +1,10 @@
 package br.com.powercrm.app.controller.impl;
 
-
-import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.domain.enums.UserStatus;
 import br.com.powercrm.app.dto.request.UserRequestDto;
+import br.com.powercrm.app.factories.UserFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +29,12 @@ class UserControllerImplTest {
     private MockMvc mockMvc;
 
     private UserRequestDto userRequestDto;
+
+
+    @BeforeEach
+    void setup(){
+        this.userRequestDto = UserFactory.makeUserRequestDto();
+    }
 
 
     @DisplayName("POST - handleAddUser should returns 400 if no name is provided")
@@ -71,5 +77,49 @@ class UserControllerImplTest {
                 .content(jsonBody)
         );
         resultActions.andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @DisplayName("POST - handleAddUser should returns 400 if no cpf is provided")
+    @Test
+    void handleAddUserShouldReturnsBadRequestWhenNoCpfIsProvided() throws Exception{
+        UserRequestDto userRequestDto = new UserRequestDto(
+                "any_name", "any_mail", "any_phone",
+                null, "any_code", "any_addres",
+                30, "any_complement", UserStatus.ACTIVE);
+        String jsonBody = objectMapper.writeValueAsString(userRequestDto);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/user")
+                .accept(MediaType.APPLICATION_JSON)
+                .content(jsonBody)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+
+    @DisplayName("POST - handleAddUser shouldReturns 400 if an invalid cpf is provided")
+    @Test
+    void handleAddUserShouldReturnsBadRequestWhenAnInvalidCpfIsProvided() throws Exception{
+        UserRequestDto userRequestDto = new UserRequestDto(
+                "any_name", "any_mail", "any_phone",
+                "111.111.111-11", "any_code", "any_addres",
+                30, "any_complement", UserStatus.ACTIVE);
+        String jsonBody = objectMapper.writeValueAsString(userRequestDto);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/user")
+                .accept(MediaType.APPLICATION_JSON)
+                .content(jsonBody)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @DisplayName("POST - handleAddUser should returns 201 when valid data is provided")
+    @Test
+    void handleAddUserShouldReturnsCreatedWhenValidDataIsProvided() throws Exception{
+        String jsonBody = objectMapper.writeValueAsString(this.userRequestDto);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/user")
+                .accept(MediaType.APPLICATION_JSON)
+                .content(jsonBody)
+                .contentType(MediaType.APPLICATION_JSON));
+        resultActions.andExpect(MockMvcResultMatchers.status().isCreated());
     }
 }

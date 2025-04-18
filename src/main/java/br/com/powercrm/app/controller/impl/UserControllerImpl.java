@@ -5,6 +5,7 @@ import br.com.powercrm.app.dto.request.UserRequestDto;
 import br.com.powercrm.app.dto.response.UserResponseDto;
 import br.com.powercrm.app.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,6 +18,6 @@ public class UserControllerImpl implements UserController {
 
     @Override
     public ResponseEntity<UserResponseDto> handleAddUser(UserRequestDto userRequestDto) {
-        return null;
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

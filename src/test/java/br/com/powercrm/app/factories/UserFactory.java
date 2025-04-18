@@ -14,7 +14,7 @@ public class UserFactory {
 
     public static UserRequestDto makeUserRequestDto(){
         return new UserRequestDto("any_name", "any_mail@mail.com", "any_phone",
-                "111.111.111-11", "any_zipcode", "any_address",
+                "640.290.140-70", "any_zipcode", "any_address",
                 30, "any_complement", UserStatus.ACTIVE);
     };
 
