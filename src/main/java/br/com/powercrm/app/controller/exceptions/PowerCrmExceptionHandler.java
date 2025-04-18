@@ -15,6 +15,9 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import static br.com.powercrm.app.utils.http.HttpHelper.badRequest;
+import static br.com.powercrm.app.utils.http.HttpHelper.unprocessedEntity;
+
 @ControllerAdvice
 public class PowerCrmExceptionHandler {
 
@@ -27,7 +30,7 @@ public class PowerCrmExceptionHandler {
             HttpHelper.getStatusCodeValue(HttpStatus.BAD_REQUEST),  HttpHelper.getPathUrlFromRequest(httpServletRequest),
             "Hibernate Validation Exception", "Please validate the errors_field to validate the payload",
             errors);
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(standardErrorResponseDto);
+    return badRequest(standardErrorResponseDto);
     }
 
 
@@ -37,7 +40,7 @@ public class PowerCrmExceptionHandler {
         StandardErrorResponseDto standardErrorResponseDto = makeStandardErrorResponseDto(
                 HttpHelper.getStatusCodeValue(HttpStatus.UNPROCESSABLE_ENTITY), HttpHelper.getPathUrlFromRequest(httpServletRequest),
                 "Entity already exists exception", exception.getMessage(), new HashSet<>());
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(standardErrorResponseDto);
+        return unprocessedEntity(standardErrorResponseDto);
     }
 
 

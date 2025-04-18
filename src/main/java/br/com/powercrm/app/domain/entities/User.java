@@ -3,7 +3,6 @@ package br.com.powercrm.app.domain.entities;
 import br.com.powercrm.app.domain.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -27,7 +26,8 @@ public class User implements Serializable {
     private String phone;
     @Column(unique = true)
     private String cpf;
-    private String zipcode;
+    @Column(name="zip_code")
+    private String zipCode;
     private String address;
     private Integer number;
     private String complement;

@@ -4,7 +4,7 @@ CREATE TABLE tb_users(
    email VARCHAR(255) NOT NULL UNIQUE,
    phone VARCHAR(45),
    cpf VARCHAR(14) NOT NULL UNIQUE,
-   zipcode VARCHAR(9),
+   zip_code VARCHAR(15),
    address VARCHAR(255),
    number SMALLINT,
    complement VARCHAR(20),

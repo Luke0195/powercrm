@@ -42,7 +42,7 @@ class UserControllerImplTest {
     void handleAddUserShouldReturnsBadRequestWhenNoNameIsProvided() throws Exception{
         UserRequestDto userRequestDto = new UserRequestDto(
                 null, "any_mail@mail.com", "any_phone", "111.111.111.11",
-                "any_zipcode", "any_address", 30, "any_complement", UserStatus.ACTIVE);
+                "XXXXXX-XXX", "any_address", 30, "any_complement", UserStatus.ACTIVE);
         String jsonBody = objectMapper.writeValueAsString(userRequestDto);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/user")
                 .accept(MediaType.APPLICATION_JSON)
@@ -55,7 +55,7 @@ class UserControllerImplTest {
     @Test
     void handleAddUserShouldReturnsBadRequestWhenNoEmailIsProvided() throws Exception{
         UserRequestDto userRequestDto = new UserRequestDto("any_name", null, "any_phone", "401.729.130-98",
-                "any_zipcode", "any_address", 30, "any_complement", UserStatus.ACTIVE);
+                "XXXXXX-XXX", "any_address", 30, "any_complement", UserStatus.ACTIVE);
         String jsonBody = objectMapper.writeValueAsString(userRequestDto);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/user")
                 .accept(MediaType.APPLICATION_JSON)
@@ -69,7 +69,7 @@ class UserControllerImplTest {
     @Test
     void handleAddUserShouldReturnsBadRequestWhenAnInvalidEmailIsProvided() throws Exception{
         UserRequestDto userRequestDto = new UserRequestDto("any_name", "any_mail", "any_phone",
-                "401.729.130-98", "any_code", "any_addres", 30, "any_complement", UserStatus.ACTIVE);
+                "401.729.130-98", "XXXXXX-XXX", "any_addres", 30, "any_complement", UserStatus.ACTIVE);
         String jsonBody = objectMapper.writeValueAsString(userRequestDto);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/user")
                 .accept(MediaType.APPLICATION_JSON)
@@ -84,7 +84,7 @@ class UserControllerImplTest {
     void handleAddUserShouldReturnsBadRequestWhenNoCpfIsProvided() throws Exception{
         UserRequestDto userRequestDto = new UserRequestDto(
                 "any_name", "any_mail", "any_phone",
-                null, "any_code", "any_addres",
+                null, "XXXXXX-XXX", "any_addres",
                 30, "any_complement", UserStatus.ACTIVE);
         String jsonBody = objectMapper.writeValueAsString(userRequestDto);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/user")
@@ -101,7 +101,7 @@ class UserControllerImplTest {
     void handleAddUserShouldReturnsBadRequestWhenAnInvalidCpfIsProvided() throws Exception{
         UserRequestDto userRequestDto = new UserRequestDto(
                 "any_name", "any_mail", "any_phone",
-                "111.111.111-11", "any_code", "any_addres",
+                "111.111.111-11", "XXXXXX-XXX", "any_addres",
                 30, "any_complement", UserStatus.ACTIVE);
         String jsonBody = objectMapper.writeValueAsString(userRequestDto);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/user")
