@@ -2,6 +2,7 @@ package br.com.powercrm.app.service;
 
 import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.domain.features.user.AddUser;
+import br.com.powercrm.app.domain.features.user.LoadUsers;
 import br.com.powercrm.app.dto.request.UserRequestDto;
 import br.com.powercrm.app.dto.response.UserResponseDto;
 import br.com.powercrm.app.repository.UserRepository;
@@ -12,11 +13,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements AddUser {
+public class UserService implements AddUser, LoadUsers {
 
     private final UserRepository userRepository;
 
@@ -30,5 +32,12 @@ public class UserService implements AddUser {
      User user = UserMapper.INSTANCE.mapToEntity(userRequestDto);
      user = userRepository.save(user);
      return UserMapper.INSTANCE.mapToResponseDto(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> loadUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream().map(UserMapper.INSTANCE::mapToResponseDto).toList();
     }
 }
