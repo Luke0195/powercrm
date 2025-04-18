@@ -14,7 +14,7 @@
   
 
 > ### Casos de sucesso
-*  [ ]  Recebe uma rota do tipo <b>POST</b> na rota /user
+*  [X]  Recebe uma rota do tipo <b>POST</b> na rota /user
 *  [ ]  Valida os campos obrigatórios(name, email,cpf).
 *  [ ]  Não permite que um usuário seja cadastrado com o mesmo email.
 *  [ ]  Não permite que um usuário seja cadastrado com o **mesmo CPF**.
