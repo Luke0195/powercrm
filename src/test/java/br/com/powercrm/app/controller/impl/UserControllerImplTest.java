@@ -122,4 +122,14 @@ class UserControllerImplTest {
                 .contentType(MediaType.APPLICATION_JSON));
         resultActions.andExpect(MockMvcResultMatchers.status().isCreated());
     }
+
+    @DisplayName("GET - handleUsers should returns 200 on success")
+    @Test
+    void handleLoadUsersShouldReturnsSuccessOnSuccess() throws Exception{
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/users")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(MockMvcResultMatchers.status().isOk());
+    }
 }
