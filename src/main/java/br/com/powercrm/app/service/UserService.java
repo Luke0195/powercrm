@@ -2,9 +2,12 @@ package br.com.powercrm.app.service;
 
 import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.domain.features.user.AddUser;
+import br.com.powercrm.app.dto.request.UserRequestDto;
+import br.com.powercrm.app.dto.response.UserResponseDto;
 import br.com.powercrm.app.repository.UserRepository;
 import br.com.powercrm.app.service.exceptions.EntityAlreadyExistsException;
 
+import br.com.powercrm.app.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +23,13 @@ public class UserService implements AddUser {
 
     @Override
     @Transactional
-    public User add(User user) {
-     Optional<User> userAlreadyExists = userRepository.findByEmail(user.getEmail());
+    public UserResponseDto add(UserRequestDto userRequestDto) {
+     Optional<User> userAlreadyExists = userRepository.findByEmail(userRequestDto.email());
      if(userAlreadyExists.isPresent()) throw new EntityAlreadyExistsException("This email is already taken!");
-     Optional<User> findUserByCpf = userRepository.findByCpf(user.getCpf());
+     Optional<User> findUserByCpf = userRepository.findByCpf(userRequestDto.cpf());
      if(findUserByCpf.isPresent()) throw new EntityAlreadyExistsException("This cpf is already taken");
-     return null;
+     User user = UserMapper.INSTANCE.mapToEntity(userRequestDto);
+     user = userRepository.save(user);
+     return UserMapper.INSTANCE.mapToResponseDto(user);
     }
 }

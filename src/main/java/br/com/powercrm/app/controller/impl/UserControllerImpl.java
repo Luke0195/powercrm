@@ -5,9 +5,11 @@ import br.com.powercrm.app.dto.request.UserRequestDto;
 import br.com.powercrm.app.dto.response.UserResponseDto;
 import br.com.powercrm.app.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 
 @RestController
@@ -18,6 +20,8 @@ public class UserControllerImpl implements UserController {
 
     @Override
     public ResponseEntity<UserResponseDto> handleAddUser(UserRequestDto userRequestDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        UserResponseDto userResponseDto = userService.add(userRequestDto);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand("/{id}", userResponseDto.id()).toUri();
+        return ResponseEntity.created(uri).body(userResponseDto);
     }
 }

@@ -1,7 +1,8 @@
 package br.com.powercrm.app.domain.features.user;
 
-import br.com.powercrm.app.domain.entities.User;
+import br.com.powercrm.app.dto.request.UserRequestDto;
+import br.com.powercrm.app.dto.response.UserResponseDto;
 
 public interface AddUser {
-    User add(User user);
+    UserResponseDto add(UserRequestDto user);
 }

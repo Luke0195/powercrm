@@ -23,6 +23,7 @@ public class UserFactory {
                 .id(UUID.randomUUID())
                 .name(userRequestDto.name())
                 .email(userRequestDto.email())
+                .cpf(userRequestDto.cpf())
                 .phone(userRequestDto.phone())
                 .number(userRequestDto.number())
                 .complement(userRequestDto.complement())

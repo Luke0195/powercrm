@@ -3,6 +3,7 @@ package br.com.powercrm.app.domain.entities;
 import br.com.powercrm.app.domain.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -31,5 +32,11 @@ public class User implements Serializable {
     private Integer number;
     private String complement;
     private UserStatus status;
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @PrePersist
+    public void prePersist(){
+        this.createdAt = LocalDateTime.now();
+    }
 }
