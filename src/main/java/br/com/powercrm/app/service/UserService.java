@@ -31,10 +31,7 @@ public class UserService implements AddUser, LoadUsers, RemoveUser {
     @Override
     @Transactional
     public UserResponseDto add(UserRequestDto userRequestDto) {
-     Optional<User> userAlreadyExists = userRepository.findByEmail(userRequestDto.email());
-     if(userAlreadyExists.isPresent()) throw new ResourceAlreadyExistsException("This email is already taken!");
-     Optional<User> findUserByCpf = userRepository.findByCpf(userRequestDto.cpf());
-     if(findUserByCpf.isPresent()) throw new ResourceAlreadyExistsException("This cpf is already taken");
+     validateUniqueFields(userRequestDto);
      User user = UserMapper.INSTANCE.mapToEntity(userRequestDto);
      user = userRepository.save(user);
      return UserMapper.INSTANCE.mapToResponseDto(user);
@@ -50,7 +47,14 @@ public class UserService implements AddUser, LoadUsers, RemoveUser {
 
     @Override
     public void remove(String id) {
-        User user = userRepository.getReferenceById(UUID.fromString(id));
-        if(Objects.isNull(user)) throw new ResourceNotFoundException("user_id not found");
+        UUID userId = UUID.fromString(id);
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("user_id not found"));
+        userRepository.delete(user);
+    }
+
+
+    public void validateUniqueFields(UserRequestDto userRequestDto){
+        if(userRepository.existsByEmail(userRequestDto.email())) throw new ResourceAlreadyExistsException("This email is already taken!");
+        if(userRepository.existsByCpf(userRequestDto.cpf())) throw new ResourceAlreadyExistsException("This CPF is already exists");
     }
 }

@@ -20,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Collections;
 import java.util.List;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -46,7 +47,7 @@ class UserServiceTest {
     @DisplayName("Add should throws EntityAlreadyExistsException when email already exists")
     @Test
     void addShouldThrowsEntityAlreadyExistsExceptionWhenEmailAlreadyExists(){
-        Mockito.when(userRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.of(user));
+        Mockito.when(userRepository.existsByEmail(Mockito.anyString())).thenReturn(true);
         Assertions.assertThrows(ResourceAlreadyExistsException.class, () -> {
             userService.add(userRequestDto);
         });
@@ -55,7 +56,7 @@ class UserServiceTest {
     @DisplayName("Add should throws EntityAlreadyExistsException when cpf already exists")
     @Test
     void addShouldThrowsEntityAlreadyExistsExceptionWhenCpfAlreadyExists(){
-        Mockito.when(userRepository.findByCpf(Mockito.any())).thenReturn(Optional.of(user));
+        Mockito.when(userRepository.existsByCpf(Mockito.any())).thenReturn(true);
         Assertions.assertThrows(ResourceAlreadyExistsException.class, () -> {
             userService.add(userRequestDto);
         });
@@ -64,8 +65,8 @@ class UserServiceTest {
     @DisplayName("Add should calls save when valid data is provided")
     @Test
     void addShouldSaveAnUserWhenValidDataIsProvided(){
-        Mockito.when(userRepository.findByEmail(userRequestDto.email())).thenReturn(Optional.empty());
-        Mockito.when(userRepository.findByCpf(userRequestDto.cpf())).thenReturn(Optional.empty());
+        Mockito.when(userRepository.existsByEmail(userRequestDto.email())).thenReturn(false);
+        Mockito.when(userRepository.existsByCpf(userRequestDto.cpf())).thenReturn(false);
         Mockito.when(userRepository.save(Mockito.any())).thenReturn(user);
         userService.add(userRequestDto);
         Mockito.verify(userRepository).save(Mockito.any());
@@ -74,8 +75,8 @@ class UserServiceTest {
     @DisplayName("Add should returns an UserResponseDto when valid data is provided")
     @Test
     void addShouldReturnsAnUserResponseDtoWhenValidDataIsProvided(){
-        Mockito.when(userRepository.findByEmail(userRequestDto.email())).thenReturn(Optional.empty());
-        Mockito.when(userRepository.findByCpf(userRequestDto.cpf())).thenReturn(Optional.empty());
+        Mockito.when(userRepository.existsByCpf(Mockito.any())).thenReturn(false);
+        Mockito.when(userRepository.existsByCpf(Mockito.any())).thenReturn(false);
         Mockito.when(userRepository.save(Mockito.any())).thenReturn(user);
         UserResponseDto userResponseDto = userService.add(userRequestDto);
         Assertions.assertNotNull(userResponseDto.id());
@@ -84,7 +85,7 @@ class UserServiceTest {
         Assertions.assertEquals("640.290.140-70", userResponseDto.cpf());
     }
 
-    @DisplayName("loadUsers should returns an empty list when no data was found")
+    @DisplayName("LoadUsers should returns an empty list when no data was found")
     @Test
     void loadUsersShouldReturnsAnEmptyListWhenNoDataIsFound(){
         Mockito.when(userRepository.findAll()).thenReturn(Collections.emptyList());
@@ -92,7 +93,7 @@ class UserServiceTest {
         Assertions.assertEquals(0, userResponseDtoList.size());
     }
 
-    @DisplayName("loadUsers should returns an list of users when was data")
+    @DisplayName("LoadUsers should returns an list of users when was data")
     @Test
     void loadUsersShouldReturnsAUserListWhenWasData(){
         Mockito.when(userRepository.findAll()).thenReturn(List.of(user));
@@ -100,14 +101,23 @@ class UserServiceTest {
         Assertions.assertEquals(1, userResponseDtoList.size());
     }
 
-    @DisplayName("delete should throws EntityNotFoundException when invalid id is provided ")
+    @DisplayName("Delete should throws EntityNotFoundException when invalid id is provided ")
     @Test
     void deleteShouldReturnsEntityNotFoundExceptionWhenInvalidIdIsProvided(){
         String invalidId = UUID.randomUUID().toString();
-        Mockito.when(userRepository.getReferenceById(Mockito.any())).thenReturn(null);
+        Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.empty());
         Assertions.assertThrows(ResourceNotFoundException.class, () -> {
            userService.remove(invalidId);
         });
+    }
+
+    @DisplayName("Delete should delete an User when valid id is provided")
+    @Test
+    void deleteShouldDeleteAnUserWhenValidIdIsProvided(){
+        String validId = UUID.randomUUID().toString();
+        Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user));
+        userService.remove(validId);
+        Mockito.verify(userRepository).delete(user);
     }
 
 }

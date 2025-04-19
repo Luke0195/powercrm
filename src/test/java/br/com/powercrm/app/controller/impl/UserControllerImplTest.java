@@ -3,21 +3,26 @@ package br.com.powercrm.app.controller.impl;
 import br.com.powercrm.app.domain.enums.UserStatus;
 import br.com.powercrm.app.dto.request.UserRequestDto;
 import br.com.powercrm.app.factories.UserFactory;
+import br.com.powercrm.app.repository.UserRepository;
+import br.com.powercrm.app.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import javax.xml.transform.Result;
+import java.util.UUID;
 
 @ActiveProfiles("dev")
 @SpringBootTest
@@ -31,6 +36,9 @@ class UserControllerImplTest {
     private MockMvc mockMvc;
 
     private UserRequestDto userRequestDto;
+
+    @MockitoBean
+    private UserService userService;
 
 
     @BeforeEach
@@ -138,11 +146,14 @@ class UserControllerImplTest {
     @DisplayName("DELETE - handleDelete should returns 204 on success")
     @Test
     void handleDeleteShouldReturnsNoContentOnSuccess() throws Exception{
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.delete("/users/{id}", "valid_id")
+        String validId = UUID.randomUUID().toString();
+        Mockito.doNothing().when(userService).remove(validId);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.delete("/users/{id}", validId)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
         );
         resultActions.andExpect(MockMvcResultMatchers.status().isNoContent());
     }
+
 
 }

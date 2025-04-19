@@ -37,6 +37,7 @@ public class UserControllerImpl implements UserController {
 
     @Override
     public ResponseEntity<Void> handleDeleteUser(String id) {
+        userService.remove(id);
         return ResponseEntity.noContent().build();
     }
 }
