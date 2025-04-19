@@ -184,4 +184,17 @@ class UserControllerImplTest {
         );
         resultActions.andExpect(MockMvcResultMatchers.status().isNotFound());
     }
+
+    @DisplayName("PUT - handleUpdate should returns 200 when valid id is provided")
+    @Test
+    void handleUpdateShouldReturnsOkWhenValidIdIsProvided() throws Exception{
+        String validId = UUID.randomUUID().toString();
+        String jsonBody = objectMapper.writeValueAsString(userRequestDto);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.put("/users/{id}", validId)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(jsonBody)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(MockMvcResultMatchers.status().isOk());
+    }
 }
