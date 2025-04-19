@@ -6,6 +6,7 @@ import lombok.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -14,7 +15,7 @@ import java.util.UUID;
 @Setter
 @Builder
 @Entity
-@Table(name = "tb_vehicle")
+@Table(name = "tb_vehicles")
 public class Vehicle implements Serializable {
 
     @Id
@@ -29,5 +30,12 @@ public class Vehicle implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
     @Column(name="created_at")
-    private Instant createdAt;
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    public void prePersist(){
+        this.createdAt = LocalDateTime.now();
+    }
+
 }
+
