@@ -3,15 +3,10 @@ package br.com.powercrm.app.controller.impl;
 import br.com.powercrm.app.domain.enums.UserStatus;
 import br.com.powercrm.app.dto.request.UserRequestDto;
 import br.com.powercrm.app.factories.UserFactory;
-import br.com.powercrm.app.repository.UserRepository;
 import br.com.powercrm.app.service.UserService;
-import br.com.powercrm.app.service.exceptions.EntityNotFoundException;
-import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;
 import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +20,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.Optional;
+
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -33,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @ActiveProfiles("dev")
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestMethodOrder(MethodOrderer.DisplayName.class)
 class UserControllerImplTest {
 
     @Autowired
@@ -45,10 +41,6 @@ class UserControllerImplTest {
 
     @MockitoBean
     private UserService userService;
-
-    @MockitoBean
-    private UserRepository userRepository;
-
 
 
     @BeforeEach
@@ -170,7 +162,7 @@ class UserControllerImplTest {
     void handleDeleteShouldReturnsNotFoundWhenInvalidIdIsProvided() throws  Exception{
         String invalidId = UUID.randomUUID().toString();
 
-        Mockito.doThrow(new EntityNotFoundException("user_id not found"))
+        Mockito.doThrow(new ResourceNotFoundException("user_id not found"))
                 .when(userService).remove(invalidId);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.delete("/users/{id}", invalidId)
                 .accept(MediaType.APPLICATION_JSON)
@@ -178,4 +170,19 @@ class UserControllerImplTest {
         );
         resultActions.andExpect(MockMvcResultMatchers.status().isNotFound()).andDo(print());
     }
+/*
+    @DisplayName("PUT - handleUpdate should returns 404 when invalid id is provided")
+    @Test
+    void handleUpdateShouldReturnsNotFoundWhenInvalidIdIsProvided() throws Exception{
+        String invalidId = UUID.randomUUID().toString();
+        String jsonBody = objectMapper.writeValueAsString(userRequestDto);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.put("/users/{id}", invalidId)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(jsonBody)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+    */
+
 }

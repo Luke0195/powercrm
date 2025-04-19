@@ -8,7 +8,6 @@ import br.com.powercrm.app.domain.features.user.UpdateUser;
 import br.com.powercrm.app.dto.request.UserRequestDto;
 import br.com.powercrm.app.dto.response.UserResponseDto;
 import br.com.powercrm.app.repository.UserRepository;
-import br.com.powercrm.app.service.exceptions.EntityNotFoundException;
 import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;
 
 import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
@@ -51,7 +50,7 @@ public class UserService implements AddUser, LoadUsers, RemoveUser, UpdateUser {
     @CacheEvict(value = "users", allEntries = true)
     public void remove(String id) {
         UUID userId = UUID.fromString(id);
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("user_id not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("user_id not found"));
         userRepository.delete(user);
     }
 

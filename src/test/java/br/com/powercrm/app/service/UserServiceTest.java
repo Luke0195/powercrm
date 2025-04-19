@@ -5,13 +5,9 @@ import br.com.powercrm.app.dto.request.UserRequestDto;
 import br.com.powercrm.app.dto.response.UserResponseDto;
 import br.com.powercrm.app.factories.UserFactory;
 import br.com.powercrm.app.repository.UserRepository;
-import br.com.powercrm.app.service.exceptions.EntityNotFoundException;
 import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;
 import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -27,6 +23,7 @@ import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("dev")
+@TestMethodOrder(MethodOrderer.DisplayName.class)
 class UserServiceTest {
 
     @InjectMocks
@@ -102,12 +99,12 @@ class UserServiceTest {
         Assertions.assertEquals(1, userResponseDtoList.size());
     }
 
-    @DisplayName("RemoveUser should throws EntityNotFoundException when invalid id is provided ")
+    @DisplayName("RemoveUser should throws ResourceNotFoundException when invalid id is provided ")
     @Test
     void deleteShouldReturnsEntityNotFoundExceptionWhenInvalidIdIsProvided(){
         String invalidId = UUID.randomUUID().toString();
         Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.empty());
-        Assertions.assertThrows(EntityNotFoundException.class, () -> {
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
            userService.remove(invalidId);
         });
     }

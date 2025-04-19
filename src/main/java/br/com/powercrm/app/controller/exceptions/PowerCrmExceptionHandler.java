@@ -2,8 +2,8 @@ package br.com.powercrm.app.controller.exceptions;
 
 import br.com.powercrm.app.dto.response.FieldErrorResponseDto;
 import br.com.powercrm.app.dto.response.StandardErrorResponseDto;
-import br.com.powercrm.app.service.exceptions.EntityNotFoundException;
 import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;
+import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
 import br.com.powercrm.app.utils.http.HttpHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -44,9 +44,9 @@ public class PowerCrmExceptionHandler {
     }
 
 
-    @ExceptionHandler(EntityNotFoundException.class)
+    @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<StandardErrorResponseDto> handleEntityNotFoundException(
-            EntityNotFoundException exception, HttpServletRequest httpServletRequest){
+            ResourceNotFoundException exception, HttpServletRequest httpServletRequest){
         StandardErrorResponseDto standardErrorResponseDto = makeStandardErrorResponseDto(
                 HttpHelper.getStatusCodeValue(HttpStatus.NOT_FOUND), HttpHelper.getPathUrlFromRequest(httpServletRequest),
                 "Entity not found!", exception.getMessage(), new HashSet<>());
