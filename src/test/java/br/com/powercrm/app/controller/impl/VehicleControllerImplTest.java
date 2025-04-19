@@ -168,7 +168,7 @@ class VehicleControllerImplTest {
     void handleDeleteShouldReturnsNoContentOnSuccess() throws Exception{
         String validId = UUID.randomUUID().toString();
         Mockito.doNothing().when(vehicleService).remove(validId);
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.delete("/users/{id}", validId)
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.delete("/vehicles/{id}", validId)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
         );
@@ -177,13 +177,14 @@ class VehicleControllerImplTest {
 
     @DisplayName("DELETE - handleDelete should returns 404 when invalid id is provided")
     @Test
-    void handleDeleteShouldReturnsNotFoundWhenInvalidIdIsProvided() throws  Exception{
+    void handleDeleteShouldReturnsNotFoundWhenInvalidIdIsProvided() throws Exception{
         String invalidId = UUID.randomUUID().toString();
-        Mockito.when(vehicleService.add(vehicleRequestDto)).thenThrow(ResourceAlreadyExistsException.class);
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.delete("/users/{id}", invalidId)
+        Mockito.doThrow(ResourceNotFoundException.class).when(vehicleService).remove(invalidId);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.delete("/vehicles/{id}", invalidId)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
         );
-        resultActions.andExpect(MockMvcResultMatchers.status().isNotFound()).andDo(print());
+        resultActions.andExpect(MockMvcResultMatchers.status().isNotFound());
     }
+
 }
