@@ -131,4 +131,27 @@ class VehicleControllerImplTest {
                 .content(jsonBody));
         resultActions.andExpect(MockMvcResultMatchers.status().isNotFound());
     }
+
+    @DisplayName("POST - handleAddVehicle should returns 201 when user id not found ")
+    @Test
+    void handleAddVehicleShouldReturnsCreatedOnSuccess() throws Exception{
+        UUID validId = UUID.randomUUID();
+        VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("any_plate", BigDecimal.valueOf(30.000),
+                2015, validId);
+        String jsonBody = objectMapper.writeValueAsString(vehicleRequestDto);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/vehicle")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(jsonBody));
+        resultActions.andExpect(MockMvcResultMatchers.status().isCreated());
+    }
+
+    @DisplayName("GET - handleLoadVehicles should returns 200 on success ")
+    @Test
+    void handleLoadVehiclesShouldReturnsSuccessOnSuccess() throws Exception{
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/vehicles")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
+        resultActions.andExpect(MockMvcResultMatchers.status().isOk());
+    }
 }

@@ -3,18 +3,23 @@ package br.com.powercrm.app.service;
 import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.domain.entities.Vehicle;
 import br.com.powercrm.app.domain.features.vehicle.AddVehicle;
+import br.com.powercrm.app.domain.features.vehicle.LoadVehicles;
 import br.com.powercrm.app.dto.request.VehicleRequestDto;
 import br.com.powercrm.app.dto.response.VehicleResponseDto;
 import br.com.powercrm.app.repository.VehicleRepository;
 import br.com.powercrm.app.service.mapper.VehicleMapper;
 import br.com.powercrm.app.service.validators.VehicleValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
-public class VehicleService implements AddVehicle {
+public class VehicleService implements AddVehicle, LoadVehicles {
 
     private final VehicleValidator vehicleValidator;
     private final VehicleRepository vehicleRepository;
@@ -22,6 +27,7 @@ public class VehicleService implements AddVehicle {
 
     @Override
     @Transactional
+    @CacheEvict(value = "vehicles", allEntries = true)
     public VehicleResponseDto add(VehicleRequestDto vehicleRequestDto) {
        User user =  vehicleValidator.validate(vehicleRequestDto);
        Vehicle vehicle = setValue(vehicleRequestDto, user);
@@ -36,5 +42,14 @@ public class VehicleService implements AddVehicle {
                 .advertisedPlate(vehicleRequestDto.advertisedPlate())
                 .vehicleYear(vehicleRequestDto.year())
                 .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable(value = "vehicles")
+    public List<VehicleResponseDto> loadVehicles() {
+        return vehicleRepository.findAll().stream().map(x -> new VehicleResponseDto(
+                x.getId(), x.getPlate(), x.getAdvertisedPlate(), x.getVehicleYear(),
+                x.getUser(), x.getCreatedAt())).toList();
     }
 }

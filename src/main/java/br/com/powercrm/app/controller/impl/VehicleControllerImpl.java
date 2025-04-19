@@ -1,17 +1,21 @@
 package br.com.powercrm.app.controller.impl;
 
 import br.com.powercrm.app.controller.VehicleController;
+import br.com.powercrm.app.domain.entities.Vehicle;
 import br.com.powercrm.app.dto.request.VehicleRequestDto;
 import br.com.powercrm.app.dto.response.VehicleResponseDto;
 import br.com.powercrm.app.service.VehicleService;
+import br.com.powercrm.app.utils.http.HttpHelper;
+import br.com.powercrm.app.utils.parser.ParserHelper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.List;
 
-import static br.com.powercrm.app.utils.http.HttpHelper.created;
-import static br.com.powercrm.app.utils.http.HttpHelper.makeURI;
+import static br.com.powercrm.app.utils.http.HttpHelper.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +30,9 @@ public class VehicleControllerImpl implements VehicleController {
     }
 
     @Override
-    public ResponseEntity<VehicleResponseDto> handleLoadVehicles(int page, int size) {
-        return null;
+    public ResponseEntity<Page<VehicleResponseDto>> handleLoadVehicles(int page, int size) {
+        List<VehicleResponseDto> vehicles = vehicleService.loadVehicles();
+        Page<VehicleResponseDto> vehiclesPaged = ParserHelper.parseListToPage(vehicles, page, size);
+        return HttpHelper.ok(vehiclesPaged);
     }
 }
