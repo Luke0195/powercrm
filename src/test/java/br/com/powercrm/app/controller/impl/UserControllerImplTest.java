@@ -170,11 +170,12 @@ class UserControllerImplTest {
         );
         resultActions.andExpect(MockMvcResultMatchers.status().isNotFound()).andDo(print());
     }
-/*
+
     @DisplayName("PUT - handleUpdate should returns 404 when invalid id is provided")
     @Test
     void handleUpdateShouldReturnsNotFoundWhenInvalidIdIsProvided() throws Exception{
         String invalidId = UUID.randomUUID().toString();
+        Mockito.doThrow(ResourceNotFoundException.class).when(userService).update(invalidId, userRequestDto);
         String jsonBody = objectMapper.writeValueAsString(userRequestDto);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.put("/users/{id}", invalidId)
                 .accept(MediaType.APPLICATION_JSON)
@@ -183,6 +184,4 @@ class UserControllerImplTest {
         );
         resultActions.andExpect(MockMvcResultMatchers.status().isNotFound());
     }
-    */
-
 }
