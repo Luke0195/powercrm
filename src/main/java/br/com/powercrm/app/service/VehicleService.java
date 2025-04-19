@@ -4,9 +4,11 @@ import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.domain.entities.Vehicle;
 import br.com.powercrm.app.domain.features.vehicle.AddVehicle;
 import br.com.powercrm.app.domain.features.vehicle.LoadVehicles;
+import br.com.powercrm.app.domain.features.vehicle.RemoveVehicle;
 import br.com.powercrm.app.dto.request.VehicleRequestDto;
 import br.com.powercrm.app.dto.response.VehicleResponseDto;
 import br.com.powercrm.app.repository.VehicleRepository;
+import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
 import br.com.powercrm.app.service.mapper.VehicleMapper;
 import br.com.powercrm.app.service.validators.VehicleValidator;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +18,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class VehicleService implements AddVehicle, LoadVehicles {
+public class VehicleService implements AddVehicle, LoadVehicles, RemoveVehicle {
 
     private final VehicleValidator vehicleValidator;
     private final VehicleRepository vehicleRepository;
@@ -52,4 +55,13 @@ public class VehicleService implements AddVehicle, LoadVehicles {
                 x.getId(), x.getPlate(), x.getAdvertisedPlate(), x.getVehicleYear(),
                 x.getUser(), x.getCreatedAt())).toList();
     }
+
+    @Override
+    @CacheEvict(value = "vehicles", allEntries = true)
+    public void remove(String id) {
+        UUID userId = UUID.fromString(id);
+        Vehicle vehicle = vehicleRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("user_id not found"));
+        vehicleRepository.delete(vehicle);
+    }
+
 }

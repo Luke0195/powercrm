@@ -35,4 +35,10 @@ public class VehicleControllerImpl implements VehicleController {
         Page<VehicleResponseDto> vehiclesPaged = ParserHelper.parseListToPage(vehicles, page, size);
         return HttpHelper.ok(vehiclesPaged);
     }
+
+    @Override
+    public ResponseEntity<Void> handleDeleteVehicle(String id) {
+        vehicleService.remove(id);
+        return HttpHelper.noContent();
+    }
 }

@@ -3,6 +3,7 @@ package br.com.powercrm.app.service;
 import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.domain.entities.Vehicle;
 import br.com.powercrm.app.dto.request.VehicleRequestDto;
+import br.com.powercrm.app.dto.response.UserResponseDto;
 import br.com.powercrm.app.dto.response.VehicleResponseDto;
 import br.com.powercrm.app.factories.UserFactory;
 import br.com.powercrm.app.factories.VehicleFactory;
@@ -17,6 +18,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -55,6 +58,13 @@ class VehicleServiceTest {
         Assertions.assertNotNull(vehicleResponseDto.advertisedPlate());
     }
 
+    @DisplayName("LoadVehicles should returns a list on success")
+    @Test
+    void loadVehiclesShouldReturnsAListOfSuccess(){
+        Mockito.when(vehicleRepository.findAll()).thenReturn(List.of(vehicle));
+        List<VehicleResponseDto> vehicles = vehicleService.loadVehicles();
+        Assertions.assertEquals(1, vehicles.size());
+    }
 
 
 

@@ -7,17 +7,17 @@
  * createdAt
 
 > ### Casos de sucesso
-*  [ ] Recebe uma rota do tipo <b>POST</b> na rota /api/vehicle
-*  [ ] Valida os campos obrigatórios(plate, advertised_price, year, ).
-*  [ ] Não permite que o veiculo seja cadastrado com a mesma placa.
-*  [ ] Não permite que um veiculo seja cadastrado com um usuário invalido..
-*  [ ] Adiciona um veiculo quando os dados forem validos.
-*  [ ] Retorna <b>201</b> com os dados do veiculo criado em caso de sucesso.
+*  [X] Recebe uma rota do tipo <b>POST</b> na rota /api/vehicle
+*  [X] Valida os campos obrigatórios(plate, advertised_price, year, ).
+*  [X] Não permite que o veiculo seja cadastrado com a mesma placa.
+*  [X] Não permite que um veiculo seja cadastrado com um usuário invalido..
+*  [X] Adiciona um veiculo quando os dados forem validos.
+*  [X] Retorna <b>201</b> com os dados do veiculo criado em caso de sucesso.
 
 #
 > ### Exceções
 * [ ] Retorna erro <b>404</b> se o endpoint <b>/api/veichule</b> não existir.
-* [ ] Retorna erro <b>400</b> se o nome do usuário não for informado.
+* [ ] Retorna erro <b>400</b> se o plate do veículo não for informado.
 * [ ] Retorna erro <b>400</b> se o email não for informado.
 * [ ] Retorna erro <b>400</b> se um email invalido for informado.
 * [ ] Retorna erro <b>400</b> se o cpf não for informado.

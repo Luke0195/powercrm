@@ -40,6 +40,10 @@ public class HttpHelper {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(data);
     }
 
+    public static<T> ResponseEntity<Void> noContent(){
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
     public static URI makeURI(Object id){
         return ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand("/{id}", id).toUri();
     }

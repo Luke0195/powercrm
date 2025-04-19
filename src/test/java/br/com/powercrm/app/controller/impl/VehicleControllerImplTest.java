@@ -1,13 +1,15 @@
 package br.com.powercrm.app.controller.impl;
 
 import br.com.powercrm.app.dto.request.VehicleRequestDto;
+import br.com.powercrm.app.factories.UserFactory;
 import br.com.powercrm.app.factories.VehicleFactory;
-import br.com.powercrm.app.service.exceptions.InvalidParamException;
+import br.com.powercrm.app.service.UserService;
+import br.com.powercrm.app.service.VehicleService;
 import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;
 import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
 import br.com.powercrm.app.service.validators.VehicleValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hibernate.validator.cfg.defs.UUIDDef;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,9 +25,10 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import javax.xml.transform.Result;
 import java.math.BigDecimal;
 import java.util.UUID;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -43,6 +46,11 @@ class VehicleControllerImplTest {
     private UUID existingId = UUID.randomUUID();
     @MockitoBean
     private VehicleValidator vehicleValidator;
+
+    @MockitoBean
+    private VehicleService vehicleService;
+    @Autowired
+    private UserService userService;
 
     @BeforeEach
     void setup(){
@@ -107,10 +115,9 @@ class VehicleControllerImplTest {
         UUID idExisting = UUID.randomUUID();
         VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("any_plate", BigDecimal.valueOf(30.000),
                 2015, idExisting);
-        Mockito.when(vehicleValidator.validate(vehicleRequestDto))
-                .thenThrow(ResourceAlreadyExistsException.class);
+        Mockito.when(vehicleService.add(vehicleRequestDto)).thenThrow(ResourceAlreadyExistsException.class);
         String jsonBody = objectMapper.writeValueAsString(vehicleRequestDto);
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post(ROUTE_NAME)
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/vehicle")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(jsonBody));
@@ -123,7 +130,7 @@ class VehicleControllerImplTest {
         UUID invalidId = UUID.randomUUID();
         VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("any_plate", BigDecimal.valueOf(30.000),
                 2015, invalidId);
-        Mockito.when(vehicleValidator.validate(vehicleRequestDto)).thenThrow(ResourceNotFoundException.class);
+        Mockito.when(vehicleService.add(vehicleRequestDto)).thenThrow(ResourceNotFoundException.class);
         String jsonBody = objectMapper.writeValueAsString(vehicleRequestDto);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/vehicle")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -138,6 +145,7 @@ class VehicleControllerImplTest {
         UUID validId = UUID.randomUUID();
         VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("any_plate", BigDecimal.valueOf(30.000),
                 2015, validId);
+        Mockito.when(vehicleService.add(vehicleRequestDto)).thenReturn(VehicleFactory.makeVehicleResponseDto(VehicleFactory.makeVehicle(vehicleRequestDto, UserFactory.makeUser(UserFactory.makeUserRequestDto()))));
         String jsonBody = objectMapper.writeValueAsString(vehicleRequestDto);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/vehicle")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -153,5 +161,29 @@ class VehicleControllerImplTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON));
         resultActions.andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @DisplayName("DELETE - handleDelete should returns 204 on success")
+    @Test
+    void handleDeleteShouldReturnsNoContentOnSuccess() throws Exception{
+        String validId = UUID.randomUUID().toString();
+        Mockito.doNothing().when(vehicleService).remove(validId);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.delete("/users/{id}", validId)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
+
+    @DisplayName("DELETE - handleDelete should returns 404 when invalid id is provided")
+    @Test
+    void handleDeleteShouldReturnsNotFoundWhenInvalidIdIsProvided() throws  Exception{
+        String invalidId = UUID.randomUUID().toString();
+        Mockito.when(vehicleService.add(vehicleRequestDto)).thenThrow(ResourceAlreadyExistsException.class);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.delete("/users/{id}", invalidId)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(MockMvcResultMatchers.status().isNotFound()).andDo(print());
     }
 }
