@@ -5,8 +5,8 @@ import br.com.powercrm.app.dto.request.UserRequestDto;
 import br.com.powercrm.app.dto.response.UserResponseDto;
 import br.com.powercrm.app.factories.UserFactory;
 import br.com.powercrm.app.repository.UserRepository;
-import br.com.powercrm.app.service.exceptions.EntityAlreadyExistsException;
-import br.com.powercrm.app.service.mapper.UserMapper;
+import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;
+import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("dev")
@@ -46,7 +47,7 @@ class UserServiceTest {
     @Test
     void addShouldThrowsEntityAlreadyExistsExceptionWhenEmailAlreadyExists(){
         Mockito.when(userRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.of(user));
-        Assertions.assertThrows(EntityAlreadyExistsException.class, () -> {
+        Assertions.assertThrows(ResourceAlreadyExistsException.class, () -> {
             userService.add(userRequestDto);
         });
     }
@@ -55,7 +56,7 @@ class UserServiceTest {
     @Test
     void addShouldThrowsEntityAlreadyExistsExceptionWhenCpfAlreadyExists(){
         Mockito.when(userRepository.findByCpf(Mockito.any())).thenReturn(Optional.of(user));
-        Assertions.assertThrows(EntityAlreadyExistsException.class, () -> {
+        Assertions.assertThrows(ResourceAlreadyExistsException.class, () -> {
             userService.add(userRequestDto);
         });
     }
@@ -97,6 +98,16 @@ class UserServiceTest {
         Mockito.when(userRepository.findAll()).thenReturn(List.of(user));
         List<UserResponseDto> userResponseDtoList = userService.loadUsers();
         Assertions.assertEquals(1, userResponseDtoList.size());
+    }
+
+    @DisplayName("delete should throws EntityNotFoundException when invalid id is provided ")
+    @Test
+    void deleteShouldReturnsEntityNotFoundExceptionWhenInvalidIdIsProvided(){
+        String invalidId = UUID.randomUUID().toString();
+        Mockito.when(userRepository.getReferenceById(Mockito.any())).thenReturn(null);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+           userService.remove(invalidId);
+        });
     }
 
 }

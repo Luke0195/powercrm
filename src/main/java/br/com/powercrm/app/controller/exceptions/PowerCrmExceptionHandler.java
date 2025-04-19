@@ -2,7 +2,7 @@ package br.com.powercrm.app.controller.exceptions;
 
 import br.com.powercrm.app.dto.response.FieldErrorResponseDto;
 import br.com.powercrm.app.dto.response.StandardErrorResponseDto;
-import br.com.powercrm.app.service.exceptions.EntityAlreadyExistsException;
+import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;
 import br.com.powercrm.app.utils.http.HttpHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -34,9 +34,9 @@ public class PowerCrmExceptionHandler {
     }
 
 
-    @ExceptionHandler(EntityAlreadyExistsException.class)
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
     public ResponseEntity<StandardErrorResponseDto> handleEntityAlreadyExistsException(
-            EntityAlreadyExistsException exception, HttpServletRequest httpServletRequest){
+            ResourceAlreadyExistsException exception, HttpServletRequest httpServletRequest){
         StandardErrorResponseDto standardErrorResponseDto = makeStandardErrorResponseDto(
                 HttpHelper.getStatusCodeValue(HttpStatus.UNPROCESSABLE_ENTITY), HttpHelper.getPathUrlFromRequest(httpServletRequest),
                 "Entity already exists exception", exception.getMessage(), new HashSet<>());
