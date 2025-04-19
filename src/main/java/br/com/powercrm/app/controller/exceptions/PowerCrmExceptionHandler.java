@@ -2,6 +2,7 @@ package br.com.powercrm.app.controller.exceptions;
 
 import br.com.powercrm.app.dto.response.FieldErrorResponseDto;
 import br.com.powercrm.app.dto.response.StandardErrorResponseDto;
+import br.com.powercrm.app.service.exceptions.InvalidParamException;
 import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;
 import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
 import br.com.powercrm.app.utils.http.HttpHelper;
@@ -53,6 +54,14 @@ public class PowerCrmExceptionHandler {
         return  notFound(standardErrorResponseDto);
     }
 
+    @ExceptionHandler(InvalidParamException.class)
+    public ResponseEntity<StandardErrorResponseDto> handleInvalidParamException(InvalidParamException exception,
+                                                                                HttpServletRequest httpServletRequest){
+        StandardErrorResponseDto standardErrorResponseDto = makeStandardErrorResponseDto(
+                HttpHelper.getStatusCodeValue(HttpStatus.NOT_FOUND), HttpHelper.getPathUrlFromRequest(httpServletRequest),
+                "Entity not found!", exception.getMessage(), new HashSet<>());
+        return  badRequest(standardErrorResponseDto);
+    }
 
 
 

@@ -7,6 +7,7 @@ import br.com.powercrm.app.factories.UserFactory;
 import br.com.powercrm.app.repository.UserRepository;
 import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;
 import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
+import br.com.powercrm.app.service.validators.UserValidator;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,6 +33,8 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private UserValidator userValidator;
     private UserRequestDto userRequestDto;
 
     private User user;
@@ -45,7 +48,7 @@ class UserServiceTest {
     @DisplayName("Add should throws EntityAlreadyExistsException when email already exists")
     @Test
     void addShouldThrowsEntityAlreadyExistsExceptionWhenEmailAlreadyExists(){
-        Mockito.when(userRepository.existsByEmail(Mockito.anyString())).thenReturn(true);
+        Mockito.doThrow(ResourceAlreadyExistsException.class).when(userValidator).validateUniqueFields(userRequestDto);
         Assertions.assertThrows(ResourceAlreadyExistsException.class, () -> {
             userService.add(userRequestDto);
         });
@@ -54,7 +57,7 @@ class UserServiceTest {
     @DisplayName("Add should throws EntityAlreadyExistsException when cpf already exists")
     @Test
     void addShouldThrowsEntityAlreadyExistsExceptionWhenCpfAlreadyExists(){
-        Mockito.when(userRepository.existsByCpf(Mockito.any())).thenReturn(true);
+        Mockito.doThrow(ResourceAlreadyExistsException.class).when(userValidator).validateUniqueFields(userRequestDto);
         Assertions.assertThrows(ResourceAlreadyExistsException.class, () -> {
             userService.add(userRequestDto);
         });
@@ -63,8 +66,7 @@ class UserServiceTest {
     @DisplayName("Add should calls save when valid data is provided")
     @Test
     void addShouldSaveAnUserWhenValidDataIsProvided(){
-        Mockito.when(userRepository.existsByEmail(userRequestDto.email())).thenReturn(false);
-        Mockito.when(userRepository.existsByCpf(userRequestDto.cpf())).thenReturn(false);
+        Mockito.doNothing().when(userValidator).validateUniqueFields(userRequestDto);
         Mockito.when(userRepository.save(Mockito.any())).thenReturn(user);
         userService.add(userRequestDto);
         Mockito.verify(userRepository).save(Mockito.any());
@@ -73,8 +75,7 @@ class UserServiceTest {
     @DisplayName("Add should returns an UserResponseDto when valid data is provided")
     @Test
     void addShouldReturnsAnUserResponseDtoWhenValidDataIsProvided(){
-        Mockito.when(userRepository.existsByCpf(Mockito.any())).thenReturn(false);
-        Mockito.when(userRepository.existsByCpf(Mockito.any())).thenReturn(false);
+        Mockito.doNothing().when(userValidator).validateUniqueFields(userRequestDto);
         Mockito.when(userRepository.save(Mockito.any())).thenReturn(user);
         UserResponseDto userResponseDto = userService.add(userRequestDto);
         Assertions.assertNotNull(userResponseDto.id());

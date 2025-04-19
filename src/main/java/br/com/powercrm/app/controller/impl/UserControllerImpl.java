@@ -10,7 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 import static br.com.powercrm.app.utils.http.HttpHelper.*;
 
@@ -29,11 +31,13 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
-    public ResponseEntity<Page<UserResponseDto>> handleLoadUsers(int page, int size) {
-        List<UserResponseDto> usersLoaded = userService.loadUsers();
+    public ResponseEntity<Page<UserResponseDto>> handleLoadUsers(int page, int size, LocalDate start, LocalDate end) {
+        List<UserResponseDto> usersLoaded = (Objects.isNull(start) || Objects.isNull(end))
+                ? userService.loadUsers() : userService.loadUsersByPeriod(start.toString(), end.toString());
         Page<UserResponseDto> usersPage = ParserHelper.parseListToPage(usersLoaded, page, size);
         return ok(usersPage);
     }
+
 
     @Override
     public ResponseEntity<Void> handleDeleteUser(String id) {

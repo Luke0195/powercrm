@@ -51,16 +51,16 @@
 ### Atualizar Usuário
 
 > ### Casos Sucesso
-* [ ] Recebe uma requisição do tipo <b>PUT</b> na rota <b>/users/{id} </b>
-* [ ] Valida se o id que está sendo passado na rota é um id valido.
-* [ ] Valida se o id informado existe.
-* [ ] Atualiza os dados do usuário caso o id seja valido.
-* [ ] Retorna <b> 200</b> com os dados atualizados.
+* [X] Recebe uma requisição do tipo <b>PUT</b> na rota <b>/users/{id} </b>
+* [X] Valida se o id que está sendo passado na rota é um id valido.
+* [X] Valida se o id informado existe.
+* [X] Atualiza os dados do usuário caso o id seja valido.
+* [X] Retorna <b> 200</b> com os dados atualizados.
   
 > ### Exceções
-* [ ] Retorna <b>404</b> se api não existir.
-* [ ] Retorna <b>404</b> caso o id do usuário não for encontrado.
-* [ ] Retorna <b>500</b> caso ocorra um erro ao atualizar um usuário.
+* [X] Retorna <b>404</b> se api não existir.
+* [X] Retorna <b>404</b> caso o id do usuário não for encontrado.
+* [X] Retorna <b>500</b> caso ocorra um erro ao atualizar um usuário.
 
 # 
 
@@ -68,16 +68,16 @@
 
 > ### Casos de Sucesso
 
-* [ ] Recebe uma requisição do tipo <b>DELETE /users/{id}</b>
-* [ ] Valida se o id que está sendo passado na rota é um id valido.
-* [ ] Valida se o id informado existe.
-* [ ] Deleta a informação do usuário.
-* [ ] Retorna <b>204</b> em caso de sucesso.
+* [X] Recebe uma requisição do tipo <b>DELETE /users/{id}</b>
+* [X] Valida se o id que está sendo passado na rota é um id valido.
+* [X] Valida se o id informado existe.
+* [X] Deleta a informação do usuário.
+* [X] Retorna <b>204</b> em caso de sucesso.
 
 > ### Exceções
-* [ ] Retorna <b>404</b> se api não existir.
-* [ ] Retorna <b>404</b> caso o id do usuário não for encontrado.
-* [ ] Retorna <b>500</b> caso ocorra um erro ao deletar um usuário.
+* [X] Retorna <b>404</b> se api não existir.
+* [X] Retorna <b>404</b> caso o id do usuário não for encontrado.
+* [X] Retorna <b>500</b> caso ocorra um erro ao deletar um usuário.
   
 #
 ## Listar Usuários por Período
@@ -86,12 +86,12 @@
  * endDate (obrigatório, formato ISO: yyyy-MM-dd)
 
 > ### Casos de Sucesso
-* [ ] Recebe uma requisição do tipo <b>GET</b> na rota <b>/users?startDate=2024-01-01&endDate=2024-01-31</b>
-* [ ] Filtra os usuários com base no campo <b>createdAt</b> entre as datas informadas
-* [ ] Retorna <b>200</b> com a lista dos usuários cadastrados nesse período
+* [X] Recebe uma requisição do tipo <b>GET</b> na rota <b>/users?startDate=2024-01-01&endDate=2024-01-31</b>
+* [X] Filtra os usuários com base no campo <b>createdAt</b> entre as datas informadas
+* [X] Retorna <b>200</b> com a lista dos usuários cadastrados nesse período
 
 > ### Exceções
-* [ ] Retorna <b>400</b> se os parâmetros startDate ou endDate não forem informados
-* [ ] Retorna <b>400</b> se as datas estiverem em formato inválido
-* [ ] Retorna <b>422</b> se a data de início for posterior à data de fim
-* [ ] Retorna <b>500</b> caso ocorra um erro ao processar a consulta
+* [X] Retorna <b>400</b> se os parâmetros startDate ou endDate não forem informados
+* [X] Retorna <b>400</b> se as datas estiverem em formato inválido
+* [X] Retorna <b>400</b> se a data de início for posterior à data de fim
+* [X] Retorna <b>500</b> caso ocorra um erro ao processar a consulta

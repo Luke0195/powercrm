@@ -4,6 +4,7 @@ import br.com.powercrm.app.domain.enums.UserStatus;
 import br.com.powercrm.app.dto.request.UserRequestDto;
 import br.com.powercrm.app.factories.UserFactory;
 import br.com.powercrm.app.service.UserService;
+import br.com.powercrm.app.service.exceptions.InvalidParamException;
 import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
@@ -12,6 +13,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cglib.core.Local;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -21,6 +23,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -143,6 +146,19 @@ class UserControllerImplTest {
                 .contentType(MediaType.APPLICATION_JSON)
         );
         resultActions.andExpect(MockMvcResultMatchers.status().isOk());
+    }
+    @DisplayName("GET - handleUsers should returns 400 if an end date is after start date")
+    @Test
+    void handleLoadUsersShouldReturnsBadRequestIfEnDateIsAfterStartDate() throws Exception{
+        String start = LocalDate.now().toString();
+        String endDate = LocalDate.now().minusDays(1).toString();
+        Mockito.doThrow(InvalidParamException.class).when(userService).loadUsersByPeriod(start, endDate);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/users")
+                        .param("start", start)
+                        .param("end", endDate)
+                        .contentType(MediaType.APPLICATION_JSON)
+                );
+        resultActions.andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @DisplayName("DELETE - handleDelete should returns 204 on success")
