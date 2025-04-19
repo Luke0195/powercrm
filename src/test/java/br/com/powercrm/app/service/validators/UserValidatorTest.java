@@ -4,6 +4,7 @@ import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.dto.request.UserRequestDto;
 import br.com.powercrm.app.factories.UserFactory;
 import br.com.powercrm.app.repository.UserRepository;
+import br.com.powercrm.app.service.exceptions.InvalidParamException;
 import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,6 +57,15 @@ class UserValidatorTest {
         Mockito.verify(userRepository).existsByCpf(Mockito.any());
     }
 
+    @DisplayName("FindUsersByPeriod should throws InvalidParamException when invalid params are provided")
+    @Test
+    void findUserByPeriodShouldThrowsInvalidParamExceptionWhenInvalidParamsAreProvided(){
+        Mockito.when(userValidator.findUsersByPeriod(null, null)).thenThrow(InvalidParamException.class);
+        Assertions.assertThrows(InvalidParamException.class, () -> {
+                userValidator.findUsersByPeriod(null, null);
+        });
+    }
+
     @DisplayName("MapDate should map data from UserRequestDo to User entity")
     @Test
     void mapDataShouldReturnsAnUserResponseDtoOnSuccess(){
@@ -66,4 +76,6 @@ class UserValidatorTest {
         Assertions.assertEquals("any_mail@mail.com", user.getEmail());
         Assertions.assertEquals("640.290.140-70", user.getCpf());
     }
+
+
 }

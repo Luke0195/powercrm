@@ -27,7 +27,6 @@ public class UserValidator {
     }
 
     public List<User> findUsersByPeriod(String start, String end)throws DateTimeParseException {
-
         if(Objects.isNull(start) && Objects.isNull(end)){
             return userRepository.findAll();
         }
