@@ -10,6 +10,7 @@ import br.com.powercrm.app.service.exceptions.EntityAlreadyExistsException;
 
 import br.com.powercrm.app.service.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,7 @@ public class UserService implements AddUser, LoadUsers {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "users")
     public List<UserResponseDto> loadUsers() {
         List<User> users = userRepository.findAll();
         return users.stream().map(UserMapper.INSTANCE::mapToResponseDto).toList();
