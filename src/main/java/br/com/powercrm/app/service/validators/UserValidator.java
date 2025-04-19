@@ -32,7 +32,7 @@ public class UserValidator {
         }
         LocalDate startDate = LocalDate.parse(start);
         LocalDate endDate = LocalDate.parse(end);
-        if(startDate.isAfter(endDate)) throw new InvalidParamException("start_date cannot be after end_date");
+        if(endDate.isBefore(startDate)) throw new InvalidParamException("start_date cannot be after end_date");
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
         return userRepository.findAllByCreatedAtBetween(startDateTime, endDateTime);

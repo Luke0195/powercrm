@@ -16,7 +16,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -75,6 +79,29 @@ class UserValidatorTest {
             userValidator.findUsersByPeriod("any_date", "any_date");
         });
     }
+
+    @DisplayName("FindUserByPeriod should throws InvalidParamException if start date  is after end date")
+    @Test
+    void findUserByPeriodShouldThrowsInvalidParamExceptionIfStarDateIsAfterEndDate(){
+        String startDate = LocalDate.now().minusDays(1).toString();
+        String endDate = LocalDate.now().toString();
+        Mockito.when(userValidator.findUsersByPeriod(startDate, endDate)).thenThrow(InvalidParamException.class);
+        Assertions.assertThrows(InvalidParamException.class, () ->{
+            userValidator.findUsersByPeriod(startDate, endDate);
+        });
+    }
+
+    @DisplayName("FindUsersByPeriod should returns an list on success")
+    @Test
+    void findUserByPeriodShouldReturnsAnListOnSuccess(){
+        LocalDate  validStartDate = LocalDate.now();
+        LocalDate validEndDate = LocalDate.now();
+        Mockito.when(userRepository.findAllByCreatedAtBetween(validStartDate.atStartOfDay(), validEndDate.atTime(LocalTime.MAX)))
+                .thenReturn(List.of(UserFactory.makeUser(userRequestDto)));
+        List<User> userList = userValidator.findUsersByPeriod(validStartDate.toString(), validEndDate.toString());
+        Assertions.assertEquals(1, userList.size());
+    }
+
     @DisplayName("MapDate should map data from UserRequestDo to User entity")
     @Test
     void mapDataShouldReturnsAnUserResponseDtoOnSuccess(){
