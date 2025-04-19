@@ -12,6 +12,8 @@ import br.com.powercrm.app.service.mapper.VehicleMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 public class VehicleValidator {
@@ -21,8 +23,9 @@ public class VehicleValidator {
 
     public User validate(VehicleRequestDto vehicleRequestDto){
       if(vehicleRepository.existsByPlate(vehicleRequestDto.plate())) throw new ResourceAlreadyExistsException("This plate is already taken!");
-      return userRepository.findById(vehicleRequestDto.userId()).orElseThrow(() ->
+      User user =  userRepository.findById(vehicleRequestDto.userId()).orElseThrow(() ->
               new ResourceNotFoundException("User id has not found"));
+      return user;
     }
 
 

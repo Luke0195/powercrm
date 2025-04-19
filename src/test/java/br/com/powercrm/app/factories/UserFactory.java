@@ -10,6 +10,7 @@ import java.util.UUID;
 public class UserFactory {
 
     private UserFactory(){};
+    public static UUID existingId = UUID.randomUUID();
 
 
     public static UserRequestDto makeUserRequestDto(){
@@ -19,8 +20,9 @@ public class UserFactory {
     };
 
     public static User makeUser(UserRequestDto userRequestDto){
+
         return User.builder()
-                .id(UUID.randomUUID())
+                .id(existingId)
                 .name(userRequestDto.name())
                 .email(userRequestDto.email())
                 .cpf(userRequestDto.cpf())

@@ -19,15 +19,16 @@ public class VehicleFactory {
 
     public static Vehicle makeVehicle(VehicleRequestDto vehicleRequestDto, User user){
         return Vehicle.builder()
+                .id(UUID.fromString("7ac3fb9f-838a-4aab-98ae-5e7b7f0e2a93"))
                 .plate(vehicleRequestDto.plate())
                 .advertisedPlate(vehicleRequestDto.advertisedPlate())
                 .user(user)
-                .year(vehicleRequestDto.year())
+                .vehicleYear(vehicleRequestDto.year())
                 .build();
     }
 
     public static VehicleResponseDto makeVehicleResponseDto(Vehicle vehicle){
         return new VehicleResponseDto(vehicle.getId(), vehicle.getPlate(), vehicle.getAdvertisedPlate(),
-                vehicle.getYear(), vehicle.getUser(), vehicle.getCreatedAt() );
+                vehicle.getVehicleYear(), vehicle.getUser(), vehicle.getCreatedAt() );
     }
 }

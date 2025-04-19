@@ -24,8 +24,17 @@ public class VehicleService implements AddVehicle {
     @Transactional
     public VehicleResponseDto add(VehicleRequestDto vehicleRequestDto) {
        User user =  vehicleValidator.validate(vehicleRequestDto);
-       Vehicle vehicle = VehicleMapper.INSTANCE.mapToEntity(vehicleRequestDto, user);
+       Vehicle vehicle = setValue(vehicleRequestDto, user);
        vehicle = vehicleRepository.save(vehicle);
        return VehicleMapper.INSTANCE.mapToDto(vehicle);
+    }
+
+    private Vehicle setValue(VehicleRequestDto vehicleRequestDto, User user){
+        return Vehicle.builder()
+                .user(user)
+                .plate(vehicleRequestDto.plate())
+                .advertisedPlate(vehicleRequestDto.advertisedPlate())
+                .vehicleYear(vehicleRequestDto.year())
+                .build();
     }
 }

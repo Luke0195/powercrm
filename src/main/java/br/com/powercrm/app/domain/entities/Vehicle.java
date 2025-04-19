@@ -5,7 +5,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.Instant;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -25,12 +25,14 @@ public class Vehicle implements Serializable {
     private String plate;
     @Column(name = "advertised_plate")
     private BigDecimal advertisedPlate;
-    private Integer year;
-    @ManyToOne
+    @Column(name = "vehicle_year")
+    private Integer vehicleYear;
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
     @Column(name="created_at")
     private LocalDateTime createdAt;
+
 
     @PrePersist
     public void prePersist(){
