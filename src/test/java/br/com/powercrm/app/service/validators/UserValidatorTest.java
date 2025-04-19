@@ -16,6 +16,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.format.DateTimeParseException;
+
 
 @ExtendWith(MockitoExtension.class)
 class UserValidatorTest {
@@ -66,6 +68,13 @@ class UserValidatorTest {
         });
     }
 
+    @DisplayName("FindUserByPeriod should throws DateParseException when invalid dates are provided")
+    @Test
+    void findUserByPeriodShouldThrowsDateParseExceptionWhenValidDatesAreProvided(){
+        Assertions.assertThrows(DateTimeParseException.class, () ->{
+            userValidator.findUsersByPeriod("any_date", "any_date");
+        });
+    }
     @DisplayName("MapDate should map data from UserRequestDo to User entity")
     @Test
     void mapDataShouldReturnsAnUserResponseDtoOnSuccess(){
