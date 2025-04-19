@@ -66,6 +66,8 @@ class UserControllerImplTest {
         resultActions.andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
+
+
     @DisplayName("POST - handleAddUser should returns 400 if no email is provided")
     @Test
     void handleAddUserShouldReturnsBadRequestWhenNoEmailIsProvided() throws Exception{
@@ -160,6 +162,20 @@ class UserControllerImplTest {
                 );
         resultActions.andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
+
+    @DisplayName("GET - handleUsers should returns 200 when dates are valid")
+    @Test
+    void handleLoadUsersShouldReturnsSuccessWhenDatesAreValid() throws Exception{
+        String start = LocalDate.now().toString();
+        String endDate = LocalDate.now().toString();
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/users")
+                .param("start", start)
+                .param("end", endDate)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
 
     @DisplayName("DELETE - handleDelete should returns 204 on success")
     @Test
