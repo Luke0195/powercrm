@@ -17,6 +17,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import javax.xml.transform.Result;
+
 @ActiveProfiles("dev")
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -131,6 +133,16 @@ class UserControllerImplTest {
                 .contentType(MediaType.APPLICATION_JSON)
         );
         resultActions.andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @DisplayName("DELETE - handleDelete should returns 204 on success")
+    @Test
+    void handleDeleteShouldReturnsNoContentOnSuccess() throws Exception{
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.delete("/users/{id}", "valid_id")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
 }

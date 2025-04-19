@@ -39,13 +39,13 @@
 ### Listar Usuários
 
 > ### Casos de Sucesso
-* [ ] Recebe uma rota do tipo <b>GET</b> na rota <b>/users</b>
-* [ ] Retorna uma lista de usuários com os usuários cadastrados.
-* [ ] Retorna <b> 200</b> com a lista de usuários cadastrados.
+* [X] Recebe uma rota do tipo <b>GET</b> na rota <b>/users</b>
+* [X] Retorna uma lista de usuários com os usuários cadastrados.
+* [X] Retorna <b> 200</b> com a lista de usuários cadastrados.
 
 > ### Exceções
-* [ ] Retorna <b>404</b> se a api não existir.
-* [ ] Retorna <b>500</b> caso ocorra um erro ao carregar os usuários.
+* [X] Retorna <b>404</b> se a api não existir.
+* [X] Retorna <b>500</b> caso ocorra um erro ao carregar os usuários.
 #
 
 ### Atualizar Usuário

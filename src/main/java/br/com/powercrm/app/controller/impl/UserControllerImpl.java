@@ -34,4 +34,9 @@ public class UserControllerImpl implements UserController {
         Page<UserResponseDto> usersPage = ParserHelper.parseListToPage(usersLoaded, page, size);
         return ok(usersPage);
     }
+
+    @Override
+    public ResponseEntity<Void> handleDeleteUser(String id) {
+        return ResponseEntity.noContent().build();
+    }
 }

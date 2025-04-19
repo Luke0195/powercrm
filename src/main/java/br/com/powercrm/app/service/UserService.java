@@ -3,6 +3,7 @@ package br.com.powercrm.app.service;
 import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.domain.features.user.AddUser;
 import br.com.powercrm.app.domain.features.user.LoadUsers;
+import br.com.powercrm.app.domain.features.user.RemoveUser;
 import br.com.powercrm.app.dto.request.UserRequestDto;
 import br.com.powercrm.app.dto.response.UserResponseDto;
 import br.com.powercrm.app.repository.UserRepository;
@@ -19,7 +20,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements AddUser, LoadUsers {
+public class UserService implements AddUser, LoadUsers, RemoveUser {
 
     private final UserRepository userRepository;
 
@@ -41,5 +42,10 @@ public class UserService implements AddUser, LoadUsers {
     public List<UserResponseDto> loadUsers() {
         List<User> users = userRepository.findAll();
         return users.stream().map(UserMapper.INSTANCE::mapToResponseDto).toList();
+    }
+
+    @Override
+    public void remove(String id) {
+
     }
 }
