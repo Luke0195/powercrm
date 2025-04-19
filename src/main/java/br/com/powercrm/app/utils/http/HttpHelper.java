@@ -36,7 +36,12 @@ public class HttpHelper {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(data);
     }
 
+    public static<T> ResponseEntity<T> notFound(T data){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(data);
+    }
+
     public static URI makeURI(Object id){
         return ServletUriComponentsBuilder.fromCurrentRequest().buildAndExpand("/{id}", id).toUri();
     }
+
 }

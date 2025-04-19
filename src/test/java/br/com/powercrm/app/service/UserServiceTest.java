@@ -5,6 +5,7 @@ import br.com.powercrm.app.dto.request.UserRequestDto;
 import br.com.powercrm.app.dto.response.UserResponseDto;
 import br.com.powercrm.app.factories.UserFactory;
 import br.com.powercrm.app.repository.UserRepository;
+import br.com.powercrm.app.service.exceptions.EntityNotFoundException;
 import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;
 import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.Assertions;
@@ -101,23 +102,42 @@ class UserServiceTest {
         Assertions.assertEquals(1, userResponseDtoList.size());
     }
 
-    @DisplayName("Delete should throws EntityNotFoundException when invalid id is provided ")
+    @DisplayName("RemoveUser should throws EntityNotFoundException when invalid id is provided ")
     @Test
     void deleteShouldReturnsEntityNotFoundExceptionWhenInvalidIdIsProvided(){
         String invalidId = UUID.randomUUID().toString();
         Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.empty());
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+        Assertions.assertThrows(EntityNotFoundException.class, () -> {
            userService.remove(invalidId);
         });
     }
 
-    @DisplayName("Delete should delete an User when valid id is provided")
+    @DisplayName("RemoveUser should delete an User when valid id is provided")
     @Test
     void deleteShouldDeleteAnUserWhenValidIdIsProvided(){
         String validId = UUID.randomUUID().toString();
         Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user));
         userService.remove(validId);
         Mockito.verify(userRepository).delete(user);
+    }
+
+    @DisplayName("UpdateUser should returns ResourceNotFoundException when invalid id is provided")
+    @Test
+    void updateUserShouldThrowsResourceNotExceptionWhenInvalidIdIsProvided(){
+        String invalidId = UUID.randomUUID().toString();
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+            userService.update(invalidId, userRequestDto);
+        });
+    }
+
+    @DisplayName("UpdateUser should update a user when valid data is provided ")
+    @Test
+    void updateUserShouldUpdateUserWhenValidDataIsProvided(){
+        String validId = UUID.randomUUID().toString();
+        Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user));
+        Mockito.when(userRepository.save(Mockito.any())).thenReturn(user);
+        UserResponseDto userResponseDto = userService.update(validId, userRequestDto);
+        Assertions.assertNotNull(userResponseDto);
     }
 
 }

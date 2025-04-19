@@ -5,6 +5,9 @@ import br.com.powercrm.app.dto.request.UserRequestDto;
 import br.com.powercrm.app.factories.UserFactory;
 import br.com.powercrm.app.repository.UserRepository;
 import br.com.powercrm.app.service.UserService;
+import br.com.powercrm.app.service.exceptions.EntityNotFoundException;
+import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;
+import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +25,10 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.Optional;
 import java.util.UUID;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @ActiveProfiles("dev")
 @SpringBootTest
@@ -39,6 +45,10 @@ class UserControllerImplTest {
 
     @MockitoBean
     private UserService userService;
+
+    @MockitoBean
+    private UserRepository userRepository;
+
 
 
     @BeforeEach
@@ -155,5 +165,17 @@ class UserControllerImplTest {
         resultActions.andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
+    @DisplayName("DELETE - handleDelete should returns 404 when invalid id is provided")
+    @Test
+    void handleDeleteShouldReturnsNotFoundWhenInvalidIdIsProvided() throws  Exception{
+        String invalidId = UUID.randomUUID().toString();
 
+        Mockito.doThrow(new EntityNotFoundException("user_id not found"))
+                .when(userService).remove(invalidId);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.delete("/users/{id}", invalidId)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(MockMvcResultMatchers.status().isNotFound()).andDo(print());
+    }
 }

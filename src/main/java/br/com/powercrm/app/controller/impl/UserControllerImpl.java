@@ -40,4 +40,11 @@ public class UserControllerImpl implements UserController {
         userService.remove(id);
         return ResponseEntity.noContent().build();
     }
+
+    @Override
+    public ResponseEntity<UserResponseDto> handleUpdateUser(String id, UserRequestDto userRequestDto) {
+        UserResponseDto userResponseDto = userService.update(id, userRequestDto);
+        return ok(userResponseDto);
+    }
+
 }

@@ -20,4 +20,7 @@ public interface UserController {
 
     @DeleteMapping(value = "/users/{id}")
     public ResponseEntity<Void> handleDeleteUser(@PathVariable String id);
+
+    @PutMapping(value = "/users/{id}")
+    public ResponseEntity<UserResponseDto> handleUpdateUser(@PathVariable String id, @RequestBody UserRequestDto userRequestDto);
 }
