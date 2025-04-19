@@ -1,6 +1,8 @@
 package br.com.powercrm.app.service.validators;
 
+import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.dto.request.VehicleRequestDto;
+import br.com.powercrm.app.factories.UserFactory;
 import br.com.powercrm.app.factories.VehicleFactory;
 import br.com.powercrm.app.repository.UserRepository;
 import br.com.powercrm.app.repository.VehicleRepository;
@@ -15,6 +17,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -36,12 +40,33 @@ class VehicleValidatorTest {
         this.vehicleRequestDto = VehicleFactory.makeVehicleRequestDto();
     }
 
-    @DisplayName("Add should throws ResourceAlreadyExistsException when vehicle plate already exists")
+    @DisplayName("Validate should throws ResourceAlreadyExistsException when vehicle plate already exists")
     @Test
-    void addShouldThrowsResourceAlreadyExistsExceptionWhenVehiclePlateAlreadyExists(){
+    void validateShouldThrowsResourceAlreadyExistsExceptionWhenVehiclePlateAlreadyExists(){
         Mockito.when(vehicleRepository.existsByPlate(vehicleRequestDto.plate())).thenThrow(ResourceAlreadyExistsException.class);
         Assertions.assertThrows(ResourceAlreadyExistsException.class, () -> {
             vehicleValidator.validate(vehicleRequestDto);
         });
     }
+
+    @DisplayName("Validate should throws ResourceNotFoundException when user_id not found")
+    @Test
+    void validateShouldThrowsResourceNotFoundExceptionWhenUserIdNotFound(){
+        Mockito.when(vehicleRepository.existsByPlate(vehicleRequestDto.plate())).thenReturn(false);
+        Mockito.when(userRepository.findById(vehicleRequestDto.userId())).thenThrow(ResourceNotFoundException.class);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+            vehicleValidator.validate(vehicleRequestDto);
+        });
+    }
+
+    @DisplayName("Validate should return an User when valid data is provided")
+    @Test
+    void validateShouldReturnsAnUserWhenValidDataIsProvided(){
+        Mockito.when(vehicleRepository.existsByPlate(vehicleRequestDto.plate())).thenReturn(false);
+        Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(UserFactory.makeUser(UserFactory.makeUserRequestDto())));
+        User user = vehicleValidator.validate(this.vehicleRequestDto);
+        Assertions.assertNotNull(user);
+    }
+
+
 }

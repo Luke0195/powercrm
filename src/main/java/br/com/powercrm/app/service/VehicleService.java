@@ -1,8 +1,13 @@
 package br.com.powercrm.app.service;
 
+import br.com.powercrm.app.domain.entities.User;
+import br.com.powercrm.app.domain.entities.Vehicle;
 import br.com.powercrm.app.domain.features.vehicle.AddVehicle;
 import br.com.powercrm.app.dto.request.VehicleRequestDto;
-import br.com.powercrm.app.repository.UserRepository;
+import br.com.powercrm.app.dto.response.VehicleResponseDto;
+import br.com.powercrm.app.repository.VehicleRepository;
+import br.com.powercrm.app.service.mapper.VehicleMapper;
+import br.com.powercrm.app.service.validators.VehicleValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,12 +16,16 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class VehicleService implements AddVehicle {
 
-    private final UserRepository userRepository;
+    private final VehicleValidator vehicleValidator;
+    private final VehicleRepository vehicleRepository;
 
 
     @Override
     @Transactional
-    public VehicleRequestDto add(VehicleRequestDto vehicleRequestDto) {
-        return null;
+    public VehicleResponseDto add(VehicleRequestDto vehicleRequestDto) {
+       User user =  vehicleValidator.validate(vehicleRequestDto);
+       Vehicle vehicle = VehicleMapper.INSTANCE.mapToEntity(vehicleRequestDto, user);
+       vehicle = vehicleRepository.save(vehicle);
+       return VehicleMapper.INSTANCE.mapToDto(vehicle);
     }
 }

@@ -1,8 +1,9 @@
 package br.com.powercrm.app.domain.features.vehicle;
 
 import br.com.powercrm.app.dto.request.VehicleRequestDto;
+import br.com.powercrm.app.dto.response.VehicleResponseDto;
 
 public interface AddVehicle {
 
-    public VehicleRequestDto add(VehicleRequestDto vehicleRequestDto);
+    public VehicleResponseDto add(VehicleRequestDto vehicleRequestDto);
 }
