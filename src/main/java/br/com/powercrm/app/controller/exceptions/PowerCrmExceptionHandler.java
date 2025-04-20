@@ -63,6 +63,7 @@ public class PowerCrmExceptionHandler {
         return  badRequest(standardErrorResponseDto);
     }
 
+//    @ExceptionHandler(JdbcSQLIntegrityConstraintViolationException.class)
 
 
     private static Set<FieldErrorResponseDto> getErrorsFromValidation(MethodArgumentNotValidException e){

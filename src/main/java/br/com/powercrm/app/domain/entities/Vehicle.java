@@ -27,7 +27,7 @@ public class Vehicle implements Serializable {
     private BigDecimal advertisedPlate;
     @Column(name = "vehicle_year")
     private Integer vehicleYear;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
     @Column(name="created_at")
