@@ -1,5 +1,7 @@
 package br.com.powercrm.app.service;
 
+import br.com.powercrm.app.domain.entities.Brand;
+import br.com.powercrm.app.domain.entities.Model;
 import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.domain.entities.Vehicle;
 import br.com.powercrm.app.domain.features.vehicle.AddVehicle;
@@ -11,8 +13,10 @@ import br.com.powercrm.app.dto.response.VehicleResponseDto;
 import br.com.powercrm.app.repository.VehicleRepository;
 import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
 import br.com.powercrm.app.service.mapper.VehicleMapper;
+import br.com.powercrm.app.service.producer.RabbitVehicleProducerService;
 import br.com.powercrm.app.service.validators.VehicleValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -28,21 +32,22 @@ public class VehicleService implements AddVehicle, LoadVehicles, RemoveVehicle, 
 
     private final VehicleValidator vehicleValidator;
     private final VehicleRepository vehicleRepository;
-
+    private final RabbitVehicleProducerService rabbitVehicleProducerService;
 
     @Override
     @Transactional
-    @CacheEvict(value = "vehicles", allEntries = true)
-    public VehicleResponseDto add(VehicleRequestDto vehicleRequestDto) {
+    public void validateVehicle(VehicleRequestDto vehicleRequestDto) {
        User user =  vehicleValidator.verifyIfIsValidPlateAndUserExists(vehicleRequestDto);
        Vehicle vehicle = setValue(vehicleRequestDto, user);
-       vehicle = vehicleRepository.save(vehicle);
-       return VehicleMapper.INSTANCE.mapToDto(vehicle);
+       vehicle.setBrand(Brand.builder().id(vehicleRequestDto.brandId()).build());
+       vehicle.setModel(Model.builder().id(vehicleRequestDto.modelId()).build());
+       rabbitVehicleProducerService.sendVehicleToValidationQueue(vehicle, "vehicle_exchange");
+       //vehicle = vehicleRepository.save(vehicle);
+
     }
 
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "vehicles")
     public List<VehicleResponseDto> loadVehicles() {
         return vehicleRepository.findAll().stream().map(x -> new VehicleResponseDto(
                 x.getId(), x.getPlate(), x.getAdvertisedPlate(), x.getVehicleYear(),

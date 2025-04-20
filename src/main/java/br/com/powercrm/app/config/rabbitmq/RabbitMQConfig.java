@@ -1,11 +1,6 @@
 package br.com.powercrm.app.config.rabbitmq;
 
-import ch.qos.logback.classic.pattern.MessageConverter;
-
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -20,11 +15,30 @@ public class RabbitMQConfig {
     public static final String QUEUE_NAME = "vehicle_creation_queue";
     public static final String EXCHANGE_NAME = "vehicle_exchange";
     public static final String ROUTING_KEY = "vehicle_routing_key";
+    public static final String DEAD_LETTER_QUEUE_NAME="vehicle_creation_dlq";
+    public static final String RETRY_QUEUE_NAME = "vehicle_creation_retry_queue";
+    public static final String DEAD_LETTER_QUEUE_EXCHANGE = "vehicle_creation_dlx_exchange";
 
 
     @Bean
     public Queue queue(){
-       return new Queue(QUEUE_NAME, true);
+       return QueueBuilder.durable(QUEUE_NAME)
+               .withArgument("x-dead-letter-exchange",DEAD_LETTER_QUEUE_EXCHANGE)
+               .withArgument("x-dead-letter-routing-key", ROUTING_KEY).build();
+    }
+
+    @Bean
+    public Queue deadLetterQueue(){
+        return QueueBuilder.durable(DEAD_LETTER_QUEUE_NAME).build();
+    }
+
+    @Bean
+    public Queue retryQueue(){
+        return QueueBuilder
+                .durable(RETRY_QUEUE_NAME)
+                .withArgument("x-message-ttl", 10000)
+                .withArgument("x-dead-letter-exchange", EXCHANGE_NAME)
+                .build();
     }
 
     @Bean
@@ -33,8 +47,24 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Binding binding(Queue queue, TopicExchange topicExchange){
-        return BindingBuilder.bind(queue).to(topicExchange).with(ROUTING_KEY);
+    public TopicExchange deadLetterExchange(){
+        return new TopicExchange(DEAD_LETTER_QUEUE_EXCHANGE);
+    }
+
+    @Bean
+    public Binding binding(Queue queue, TopicExchange exchange){
+        return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY);
+    }
+
+
+    @Bean
+    public Binding dlqBinding(Queue deadLetterQueue, TopicExchange deadLetterExchange) {
+        return BindingBuilder.bind(deadLetterQueue).to(deadLetterExchange).with(ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding retryBinding(Queue retryQueue, TopicExchange exchange) {
+        return BindingBuilder.bind(retryQueue).to(exchange).with(ROUTING_KEY);
     }
 
     @Bean

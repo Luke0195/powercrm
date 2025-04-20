@@ -7,23 +7,26 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.ServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Tag(name = "Veículos", description = "Recurso para gerenciar veículos")
 public interface VehicleController {
 
     @PostMapping(value = "/vehicle")
-    @Operation(summary = "Criar um veículo", description = "Cria um veículo e retorna os dados cadastrados")
+    @Operation(summary = "Método de validação de veiculo", description = "Cria um veículo e retorna os dados cadastrados")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Veículo criado com sucesso", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "202", description = "Aceito com os dados sendo enviados para o processo de validação.", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "400", description = "Erro de validação dos campos de entrada", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "422", description = "Erro ao processar a requisição", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "500", description = "Erro interno no servidor", content = @Content(mediaType = "application/json"))
     })
-    ResponseEntity<VehicleResponseDto> handleAddVehicle(@Valid @RequestBody VehicleRequestDto vehicleRequestDto);
+    ResponseEntity<Map<String,Object>> handleValidateVehicle(@Valid @RequestBody VehicleRequestDto vehicleRequestDto);
 
     @GetMapping(value = "/vehicles")
     @Operation(summary = "Listar todos os veículos", description = "Retorna todos os veículos cadastrados no sistema")

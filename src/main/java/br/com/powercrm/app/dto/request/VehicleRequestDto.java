@@ -1,5 +1,6 @@
 package br.com.powercrm.app.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
@@ -24,20 +25,20 @@ public record VehicleRequestDto(
         UUID userId,
         @NotNull(message = "The field brand_id must be required")
         @JsonProperty("brand_id")
-        Integer brandId,
+        Long brandId,
         @NotNull(message = "The field model_id must be required")
         @JsonProperty("model_id")
-        Integer modelId
+        Long modelId,
+        @JsonIgnore
+        BigDecimal fipePrice
         ) {
 
 
-        @Override
-        public Integer modelId() {
+        public Long modelId() {
                 return modelId;
         }
 
-        @Override
-        public Integer brandId() {
+        public Long brandId() {
                 return brandId;
         }
 
@@ -59,5 +60,10 @@ public record VehicleRequestDto(
         @Override
         public String plate() {
                 return plate;
+        }
+
+        @Override
+        public BigDecimal fipePrice() {
+                return fipePrice;
         }
 }

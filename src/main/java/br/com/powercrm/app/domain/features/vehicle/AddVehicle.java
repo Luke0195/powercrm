@@ -5,5 +5,5 @@ import br.com.powercrm.app.dto.response.VehicleResponseDto;
 
 public interface AddVehicle {
 
-    public VehicleResponseDto add(VehicleRequestDto vehicleRequestDto);
+    public void validateVehicle(VehicleRequestDto vehicleRequestDto);
 }

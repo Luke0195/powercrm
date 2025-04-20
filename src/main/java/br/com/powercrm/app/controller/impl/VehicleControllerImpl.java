@@ -3,15 +3,19 @@ package br.com.powercrm.app.controller.impl;
 import br.com.powercrm.app.controller.VehicleController;
 import br.com.powercrm.app.dto.request.VehicleRequestDto;
 import br.com.powercrm.app.dto.response.VehicleResponseDto;
-import br.com.powercrm.app.service.RabbitNotificationService;
+import br.com.powercrm.app.service.producer.RabbitVehicleProducerService;
 import br.com.powercrm.app.service.VehicleService;
 import br.com.powercrm.app.utils.parser.ParserHelper;
+import jakarta.servlet.ServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static br.com.powercrm.app.utils.http.HttpHelper.*;
 
@@ -20,16 +24,14 @@ import static br.com.powercrm.app.utils.http.HttpHelper.*;
 public class VehicleControllerImpl implements VehicleController {
 
     private final VehicleService vehicleService;
-    private final RabbitNotificationService rabbitNotificationService;
 
     @Override
-    public ResponseEntity<VehicleResponseDto> handleAddVehicle(VehicleRequestDto vehicleRequestDto) {
-        rabbitNotificationService.validateVehicle(vehicleRequestDto, "vehicle_exchange");
-
-        //VehicleResponseDto vehicleResponseDto = vehicleService.add(vehicleRequestDto);
-       // URI uri = makeURI(vehicleResponseDto.id());
-        //return created(uri, vehicleResponseDto);
-        return null;
+    public ResponseEntity<Map<String,Object>> handleValidateVehicle(VehicleRequestDto vehicleRequestDto) {
+        vehicleService.validateVehicle(vehicleRequestDto);
+        HashMap<String,Object> response = new HashMap<>();
+        response.put("message", "Sua solicitação de cadastro do veículo foi recebida com sucesso!" +
+                "\n O veículo passará por um processo de validação e será salvo caso todas as informações sejam confirmadas com sucesso");
+        return ResponseEntity.accepted().body(response);
     }
 
     @Override
