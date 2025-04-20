@@ -17,10 +17,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 
-
+@Tag(name="Usuários", description = "Operações relacionadas a usuários")
 public interface UserController {
     @PostMapping(value = "/user")
-    @Tag(name = "Adicionar Usuário", description = "Recurso para criar um usuário")
     @Operation(summary = "Criar um usuário", description = "Cria um usuário e retorna os dados cadastrados",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(mediaType = "application/json"))
     )
@@ -34,8 +33,7 @@ public interface UserController {
 
 
     @GetMapping(value = "/users" )
-    @Tag(name="Listar Usuários", description = "Recurso para lista os usuários")
-    @Operation(summary = "Lista todos os usuários", description = "Retorna todos os usuários no sistema")
+    @Operation(summary = "", description = "Retorna todos os usuários no sistema")
     @ApiResponses(value ={
             @ApiResponse(responseCode = "200", description = "Ação realiza com sucesso", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "400", description = "Parâmetros inválidos", content = @Content(mediaType = "application/json")),
@@ -47,7 +45,6 @@ public interface UserController {
             @RequestParam(value = "start", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
             @RequestParam(value = "end", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end);
 
-    @Tag(name="Deletar Usuário", description = "Deleta um usuário por id")
     @Operation(summary = "Deletar Usuário", description = "Delete usuário por id")
     @ApiResponses(value ={
             @ApiResponse(responseCode = "204", description = "Ação realiza com sucesso",
@@ -61,7 +58,6 @@ public interface UserController {
     public ResponseEntity<Void> handleDeleteUser(@PathVariable String id);
 
 
-    @Tag(name="Atualizar Usuário", description = "Atualiza um usuário por id")
     @Operation(summary = "Atualizar Usuário", description = "Atualiza usuário por id")
     @ApiResponses(value ={
             @ApiResponse(responseCode = "200", description = "Ação realiza com sucesso",
