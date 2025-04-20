@@ -4,5 +4,5 @@ import br.com.powercrm.app.dto.request.VehicleRequestDto;
 import br.com.powercrm.app.dto.response.VehicleResponseDto;
 
 public interface UpdateVehicle {
-    public VehicleResponseDto update(Long id, VehicleRequestDto vehicleRequestDto);
+    public VehicleResponseDto update(String id, VehicleRequestDto vehicleRequestDto);
 }

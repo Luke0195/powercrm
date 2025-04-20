@@ -44,7 +44,7 @@ class VehicleControllerImplTest {
     private VehicleRequestDto vehicleRequestDto;
 
     private UUID existingId = UUID.randomUUID();
-    @MockitoBean
+    @Autowired
     private VehicleValidator vehicleValidator;
 
     @MockitoBean

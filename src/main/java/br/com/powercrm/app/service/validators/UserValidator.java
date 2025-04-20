@@ -1,7 +1,9 @@
 package br.com.powercrm.app.service.validators;
 
 import br.com.powercrm.app.domain.entities.User;
+import br.com.powercrm.app.domain.entities.Vehicle;
 import br.com.powercrm.app.dto.request.UserRequestDto;
+import br.com.powercrm.app.dto.request.VehicleRequestDto;
 import br.com.powercrm.app.repository.UserRepository;
 import br.com.powercrm.app.service.exceptions.InvalidParamException;
 import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;
@@ -39,7 +41,7 @@ public class UserValidator {
 
     }
 
-    public void mapData(UserRequestDto userRequestDto, User user){
+    public void mapUserRequestDtoToUser(UserRequestDto userRequestDto, User user){
         user.setName(userRequestDto.name());
         user.setEmail(userRequestDto.email());
         user.setPhone(userRequestDto.phone());
@@ -49,4 +51,6 @@ public class UserValidator {
         user.setComplement(userRequestDto.complement());
         user.setStatus(userRequestDto.status());
     }
+
+
 }

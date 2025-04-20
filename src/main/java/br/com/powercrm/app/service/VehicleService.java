@@ -33,7 +33,7 @@ public class VehicleService implements AddVehicle, LoadVehicles, RemoveVehicle, 
     @Transactional
     @CacheEvict(value = "vehicles", allEntries = true)
     public VehicleResponseDto add(VehicleRequestDto vehicleRequestDto) {
-       User user =  vehicleValidator.verifyIsValidPlateAndUserExists(vehicleRequestDto);
+       User user =  vehicleValidator.verifyIfIsValidPlateAndUserExists(vehicleRequestDto);
        Vehicle vehicle = setValue(vehicleRequestDto, user);
        vehicle = vehicleRepository.save(vehicle);
        return VehicleMapper.INSTANCE.mapToDto(vehicle);
@@ -66,7 +66,11 @@ public class VehicleService implements AddVehicle, LoadVehicles, RemoveVehicle, 
     }
 
     @Override
-    public VehicleResponseDto update(Long id, VehicleRequestDto vehicleRequestDto) {
-        return null;
+    @CacheEvict(value = "vehicles", allEntries = true)
+    public VehicleResponseDto update(String id, VehicleRequestDto vehicleRequestDto) {
+        Vehicle vehicle = vehicleValidator.verifyIfIsValidVehicleId(id);
+        vehicleValidator.mapVehicleRequestDtoToVehicle(vehicleRequestDto, vehicle);
+        vehicle = vehicleRepository.save(vehicle);
+        return VehicleMapper.INSTANCE.mapToDto(vehicle);
     }
 }

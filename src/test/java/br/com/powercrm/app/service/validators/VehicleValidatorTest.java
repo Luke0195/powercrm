@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 class VehicleValidatorTest {
@@ -50,7 +51,7 @@ class VehicleValidatorTest {
     void validateShouldThrowsResourceAlreadyExistsExceptionWhenVehiclePlateAlreadyExists(){
         Mockito.when(vehicleRepository.existsByPlate(vehicleRequestDto.plate())).thenThrow(ResourceAlreadyExistsException.class);
         Assertions.assertThrows(ResourceAlreadyExistsException.class, () -> {
-            vehicleValidator.verifyIsValidPlateAndUserExists(vehicleRequestDto);
+            vehicleValidator.verifyIfIsValidPlateAndUserExists(vehicleRequestDto);
         });
     }
 
@@ -60,7 +61,7 @@ class VehicleValidatorTest {
         Mockito.when(vehicleRepository.existsByPlate(vehicleRequestDto.plate())).thenReturn(false);
         Mockito.when(userRepository.findById(vehicleRequestDto.userId())).thenThrow(ResourceNotFoundException.class);
         Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            vehicleValidator.verifyIsValidPlateAndUserExists(vehicleRequestDto);
+            vehicleValidator.verifyIfIsValidPlateAndUserExists(vehicleRequestDto);
         });
     }
 
@@ -69,7 +70,7 @@ class VehicleValidatorTest {
     void validateShouldReturnsAnUserWhenValidDataIsProvided(){
         Mockito.when(vehicleRepository.existsByPlate(vehicleRequestDto.plate())).thenReturn(false);
         Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user));
-        User user = vehicleValidator.verifyIsValidPlateAndUserExists(this.vehicleRequestDto);
+        User user = vehicleValidator.verifyIfIsValidPlateAndUserExists(this.vehicleRequestDto);
         Assertions.assertNotNull(user);
     }
 
@@ -92,5 +93,16 @@ class VehicleValidatorTest {
         Assertions.assertEquals(BigDecimal.valueOf(30.0), vehicleResponseDto.advertisedPlate());
     }
 
+    @DisplayName("MapVehicle should parse VehicleRequestDto to vehicle")
+    @Test
+    void mapVehicleShouldParseVehicleRequestDtoToVehicle(){
+        UUID existingId = UUID.randomUUID();
+        Vehicle vehicle = new Vehicle();
+        VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("any_plate", BigDecimal.valueOf(30.000), 2015,existingId);
+        vehicleValidator.mapVehicleRequestDtoToVehicle(vehicleRequestDto, vehicle);
+        Assertions.assertEquals(2015, vehicle.getVehicleYear());
+        Assertions.assertEquals("any_plate", vehicle.getPlate());
+        Assertions.assertEquals(BigDecimal.valueOf(30.000), vehicle.getAdvertisedPlate());
+    }
 
 }

@@ -3,7 +3,7 @@ package br.com.powercrm.app.service;
 import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.domain.entities.Vehicle;
 import br.com.powercrm.app.dto.request.VehicleRequestDto;
-import br.com.powercrm.app.dto.response.UserResponseDto;
+
 import br.com.powercrm.app.dto.response.VehicleResponseDto;
 import br.com.powercrm.app.factories.UserFactory;
 import br.com.powercrm.app.factories.VehicleFactory;
@@ -52,7 +52,7 @@ class VehicleServiceTest {
     @DisplayName("Add should save a vehicle when valid data is provided")
     @Test
     void addShouldSaveAVehicleWhenValidDataIsProvided(){
-        Mockito.when(vehicleValidator.verifyIsValidPlateAndUserExists(vehicleRequestDto)).thenReturn(user);
+        Mockito.when(vehicleValidator.verifyIfIsValidPlateAndUserExists(vehicleRequestDto)).thenReturn(user);
         Mockito.when(vehicleRepository.save(Mockito.any())).thenReturn(vehicle);
         VehicleResponseDto vehicleResponseDto = vehicleService.add(vehicleRequestDto);
         Assertions.assertNotNull(vehicleResponseDto.id());

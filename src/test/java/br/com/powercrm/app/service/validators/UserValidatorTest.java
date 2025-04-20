@@ -109,11 +109,12 @@ class UserValidatorTest {
     void mapDataShouldReturnsAnUserResponseDtoOnSuccess(){
         UserRequestDto userRequestDto = UserFactory.makeUserRequestDto();
         User user = new User();
-        userValidator.mapData(userRequestDto, user);
+        userValidator.mapUserRequestDtoToUser(userRequestDto, user);
         Assertions.assertEquals("any_name", user.getName());
         Assertions.assertEquals("any_mail@mail.com", user.getEmail());
         Assertions.assertEquals("640.290.140-70", user.getCpf());
     }
+
 
 
 }

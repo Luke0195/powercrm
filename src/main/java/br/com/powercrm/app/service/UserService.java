@@ -5,7 +5,6 @@ import br.com.powercrm.app.domain.features.user.*;
 import br.com.powercrm.app.dto.request.UserRequestDto;
 import br.com.powercrm.app.dto.response.UserResponseDto;
 import br.com.powercrm.app.repository.UserRepository;
-import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;
 
 import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
 import br.com.powercrm.app.service.mapper.UserMapper;
@@ -57,7 +56,7 @@ public class UserService implements AddUser, LoadUsers, RemoveUser, UpdateUser, 
     @Transactional
     public UserResponseDto update(String id, UserRequestDto userRequestDto) {
         User user=  userRepository.findById(UUID.fromString(id)).orElseThrow(() -> new ResourceNotFoundException("User with ID " + id + " was not found!"));
-        userValidator.mapData(userRequestDto,user);
+        userValidator.mapUserRequestDtoToUser(userRequestDto,user);
         user = userRepository.save(user);
         return UserMapper.INSTANCE.mapToResponseDto(user);
     }
