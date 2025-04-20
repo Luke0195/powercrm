@@ -21,12 +21,14 @@ public class VehicleValidator {
     private final VehicleRepository vehicleRepository;
     private final UserRepository userRepository;
 
-    public User validate(VehicleRequestDto vehicleRequestDto){
+    public User verifyIsValidPlateAndUserExists(VehicleRequestDto vehicleRequestDto){
       if(vehicleRepository.existsByPlate(vehicleRequestDto.plate())) throw new ResourceAlreadyExistsException("This plate is already taken!");
       User user =  userRepository.findById(vehicleRequestDto.userId()).orElseThrow(() ->
               new ResourceNotFoundException("User id has not found"));
       return user;
     }
+
+
 
 
     public Vehicle mapToEntity(VehicleRequestDto vehicleRequestDto, User user){

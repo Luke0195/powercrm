@@ -52,7 +52,7 @@ class VehicleServiceTest {
     @DisplayName("Add should save a vehicle when valid data is provided")
     @Test
     void addShouldSaveAVehicleWhenValidDataIsProvided(){
-        Mockito.when(vehicleValidator.validate(vehicleRequestDto)).thenReturn(user);
+        Mockito.when(vehicleValidator.verifyIsValidPlateAndUserExists(vehicleRequestDto)).thenReturn(user);
         Mockito.when(vehicleRepository.save(Mockito.any())).thenReturn(vehicle);
         VehicleResponseDto vehicleResponseDto = vehicleService.add(vehicleRequestDto);
         Assertions.assertNotNull(vehicleResponseDto.id());

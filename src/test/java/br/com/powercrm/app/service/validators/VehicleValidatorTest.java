@@ -50,7 +50,7 @@ class VehicleValidatorTest {
     void validateShouldThrowsResourceAlreadyExistsExceptionWhenVehiclePlateAlreadyExists(){
         Mockito.when(vehicleRepository.existsByPlate(vehicleRequestDto.plate())).thenThrow(ResourceAlreadyExistsException.class);
         Assertions.assertThrows(ResourceAlreadyExistsException.class, () -> {
-            vehicleValidator.validate(vehicleRequestDto);
+            vehicleValidator.verifyIsValidPlateAndUserExists(vehicleRequestDto);
         });
     }
 
@@ -60,7 +60,7 @@ class VehicleValidatorTest {
         Mockito.when(vehicleRepository.existsByPlate(vehicleRequestDto.plate())).thenReturn(false);
         Mockito.when(userRepository.findById(vehicleRequestDto.userId())).thenThrow(ResourceNotFoundException.class);
         Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            vehicleValidator.validate(vehicleRequestDto);
+            vehicleValidator.verifyIsValidPlateAndUserExists(vehicleRequestDto);
         });
     }
 
@@ -69,7 +69,7 @@ class VehicleValidatorTest {
     void validateShouldReturnsAnUserWhenValidDataIsProvided(){
         Mockito.when(vehicleRepository.existsByPlate(vehicleRequestDto.plate())).thenReturn(false);
         Mockito.when(userRepository.findById(Mockito.any())).thenReturn(Optional.of(user));
-        User user = vehicleValidator.validate(this.vehicleRequestDto);
+        User user = vehicleValidator.verifyIsValidPlateAndUserExists(this.vehicleRequestDto);
         Assertions.assertNotNull(user);
     }
 

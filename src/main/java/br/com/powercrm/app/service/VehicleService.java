@@ -5,6 +5,7 @@ import br.com.powercrm.app.domain.entities.Vehicle;
 import br.com.powercrm.app.domain.features.vehicle.AddVehicle;
 import br.com.powercrm.app.domain.features.vehicle.LoadVehicles;
 import br.com.powercrm.app.domain.features.vehicle.RemoveVehicle;
+import br.com.powercrm.app.domain.features.vehicle.UpdateVehicle;
 import br.com.powercrm.app.dto.request.VehicleRequestDto;
 import br.com.powercrm.app.dto.response.VehicleResponseDto;
 import br.com.powercrm.app.repository.VehicleRepository;
@@ -22,7 +23,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class VehicleService implements AddVehicle, LoadVehicles, RemoveVehicle {
+public class VehicleService implements AddVehicle, LoadVehicles, RemoveVehicle, UpdateVehicle {
 
     private final VehicleValidator vehicleValidator;
     private final VehicleRepository vehicleRepository;
@@ -32,7 +33,7 @@ public class VehicleService implements AddVehicle, LoadVehicles, RemoveVehicle {
     @Transactional
     @CacheEvict(value = "vehicles", allEntries = true)
     public VehicleResponseDto add(VehicleRequestDto vehicleRequestDto) {
-       User user =  vehicleValidator.validate(vehicleRequestDto);
+       User user =  vehicleValidator.verifyIsValidPlateAndUserExists(vehicleRequestDto);
        Vehicle vehicle = setValue(vehicleRequestDto, user);
        vehicle = vehicleRepository.save(vehicle);
        return VehicleMapper.INSTANCE.mapToDto(vehicle);
@@ -64,4 +65,8 @@ public class VehicleService implements AddVehicle, LoadVehicles, RemoveVehicle {
         vehicleRepository.delete(vehicle);
     }
 
+    @Override
+    public VehicleResponseDto update(Long id, VehicleRequestDto vehicleRequestDto) {
+        return null;
+    }
 }

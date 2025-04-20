@@ -19,4 +19,7 @@ public interface VehicleController {
 
     @DeleteMapping(value = "/vehicles/{id}")
     public ResponseEntity<Void> handleDeleteVehicle(@PathVariable String id);
+
+    @PutMapping(value = "/vehicles/{id}")
+    public ResponseEntity<VehicleResponseDto> handleUpdate(@PathVariable String id, @RequestBody VehicleRequestDto vehicleRequestDto);
 }

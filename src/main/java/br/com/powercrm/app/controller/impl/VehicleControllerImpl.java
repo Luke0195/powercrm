@@ -41,4 +41,11 @@ public class VehicleControllerImpl implements VehicleController {
         vehicleService.remove(id);
         return HttpHelper.noContent();
     }
+
+    @Override
+    public ResponseEntity<VehicleResponseDto> handleUpdate(String id, VehicleRequestDto vehicleRequestDto) {
+        return null;
+    }
+
+
 }
