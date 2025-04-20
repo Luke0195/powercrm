@@ -112,7 +112,7 @@ class VehicleControllerImplTest {
     @Test
     void handleAddVehicleShouldReturnsUnprocessedEntityWheNoUserPlateIsProvided() throws Exception{
         UUID idExisting = UUID.randomUUID();
-        VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("any_plate", BigDecimal.valueOf(30.000),
+        VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("HHA-1281", BigDecimal.valueOf(30.000),
                 2015, idExisting);
         Mockito.when(vehicleService.add(vehicleRequestDto)).thenThrow(ResourceAlreadyExistsException.class);
         String jsonBody = objectMapper.writeValueAsString(vehicleRequestDto);
@@ -127,7 +127,7 @@ class VehicleControllerImplTest {
     @Test
     void handleAddVehicleShouldReturnsUnprocessedEntityWheAnInvalidUserIdIsProvided() throws Exception{
         UUID invalidId = UUID.randomUUID();
-        VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("any_plate", BigDecimal.valueOf(30.000),
+        VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("HHA-1281", BigDecimal.valueOf(30.000),
                 2015, invalidId);
         Mockito.when(vehicleService.add(vehicleRequestDto)).thenThrow(ResourceNotFoundException.class);
         String jsonBody = objectMapper.writeValueAsString(vehicleRequestDto);
@@ -142,7 +142,7 @@ class VehicleControllerImplTest {
     @Test
     void handleAddVehicleShouldReturnsCreatedOnSuccess() throws Exception{
         UUID validId = UUID.randomUUID();
-        VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("any_plate", BigDecimal.valueOf(30.000),
+        VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("HHA-1281", BigDecimal.valueOf(30.000),
                 2015, validId);
         Mockito.when(vehicleService.add(vehicleRequestDto)).thenReturn(VehicleFactory.makeVehicleResponseDto(VehicleFactory.makeVehicle(vehicleRequestDto, UserFactory.makeUser(UserFactory.makeUserRequestDto()))));
         String jsonBody = objectMapper.writeValueAsString(vehicleRequestDto);

@@ -1,28 +1,36 @@
-### Cadastrar Veículos
+> ### Cadastrar Veículos
 
->### Dados de Entrada
- * plate(required, unique)
- * advertised_price(required)
- * year(required)
- * user_id(required)
- * createdAt
+> ##### Dados de Entrada:
 
-> ### Casos de sucesso
-*  [X] Recebe uma rota do tipo <b>POST</b> na rota /api/vehicle
-*  [X] Valida os campos obrigatórios(plate, advertised_price, year, ).
-*  [X] Não permite que o veiculo seja cadastrado com a mesma placa.
-*  [X] Não permite que um veiculo seja cadastrado com um usuário invalido..
-*  [X] Adiciona um veiculo quando os dados forem validos.
-*  [X] Retorna <b>201</b> com os dados do veiculo criado em caso de sucesso.
+ * <b>plate</b> (required, unique) – Placa do veículo (exemplo: "ABC-1234")
 
-#
-> ### Exceções
-* [ ] Retorna erro <b>404</b> se o endpoint <b>/api/veichule</b> não existir.
-* [ ] Retorna erro <b>400</b> se o plate do veículo não for informado.
-* [ ] Retorna erro <b>400</b> se o email não for informado.
-* [ ] Retorna erro <b>400</b> se um email invalido for informado.
-* [ ] Retorna erro <b>400</b> se o cpf não for informado.
-* [ ] Retorna erro <b>422</b> se o **email informado já estiver sendo utilizado**.
-* [ ] Retorna erro <b>422</b> se o **CPF informado já estiver sendo utilizado**.
-* [ ] Retorna erro <b>500</b> se ocorrer um erro ao salvar um usuário.
-  
+ * <b>advertised_price</b> (required) – Preço do veículo (exemplo: 35000.00)
+
+ * <b>year</b> (required) – Ano de fabricação (exemplo: 2018)
+
+ * <b>user_id</b> (required) – ID do usuário que está cadastrando o veículo (exemplo: 123)
+
+ * <b>createdAt</b> – Data de criação (formato ISO 8601, ex: "2025-04-20T12:00:00Z")
+
+> ##### Casos de sucesso:
+
+* [ ] Recebe uma requisição POST na rota /api/vehicle.
+* [ ] Valida que os campos obrigatórios (plate, advertised_price, year, user_id) estão presentes.
+* [ ] Impede que o veículo seja cadastrado com a mesma placa.
+* [ ] Impede que um veículo seja cadastrado com um user_id inválido.
+* [ ] Adiciona um veículo quando todos os dados são válidos.
+* [ ] Retorna status 201 Created com os dados do veículo cadastrado em caso de sucesso.
+
+> #### Exceções:
+
+* [ ] Retorna erro 404 Not Found se o endpoint /api/vehicle não existir.
+* [ ] Retorna erro 400 Bad Request se o campo plate não for informado.
+* [ ] Retorna erro 400 Bad Request se o campo advertised_price não for informado.
+* [ ] Retorna erro 400 Bad Request se o campo year não for informado.
+* [ ] Retorna erro 400 Bad Request se o campo user_id não for informado.
+
+Retorna erro 400 Bad Request se o plate não estiver no formato correto.
+
+Retorna erro 400 Bad Request se o user_id não for válido (exemplo: não existir no banco de dados).
+
+Retorna erro 409 Conflict se o plate do veículo já estiver registrado.
