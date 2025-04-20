@@ -1,9 +1,7 @@
 package br.com.powercrm.app.service.validators;
 
 import br.com.powercrm.app.domain.entities.User;
-import br.com.powercrm.app.domain.entities.Vehicle;
 import br.com.powercrm.app.dto.request.UserRequestDto;
-import br.com.powercrm.app.dto.request.VehicleRequestDto;
 import br.com.powercrm.app.repository.UserRepository;
 import br.com.powercrm.app.service.exceptions.InvalidParamException;
 import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;

@@ -3,7 +3,6 @@ package br.com.powercrm.app.service;
 import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.domain.entities.Vehicle;
 import br.com.powercrm.app.dto.request.VehicleRequestDto;
-
 import br.com.powercrm.app.dto.response.VehicleResponseDto;
 import br.com.powercrm.app.factories.UserFactory;
 import br.com.powercrm.app.factories.VehicleFactory;
@@ -78,6 +77,17 @@ class VehicleServiceTest {
             vehicleService.remove(invalidId);
         });
     }
+
+    @DisplayName("UpdateVehicle should update a vehicle when valid data is provided ")
+    @Test
+    void updateVehicleShouldUpdateUserWhenValidDataIsProvided(){
+        String validId = UUID.randomUUID().toString();
+        Mockito.when(vehicleValidator.verifyIfIsValidVehicleId(validId)).thenReturn(vehicle);
+        Mockito.when(vehicleRepository.save(Mockito.any())).thenReturn(vehicle);
+        VehicleResponseDto vehicleResponseDto = vehicleService.update(validId, vehicleRequestDto);
+        Assertions.assertNotNull(vehicleResponseDto);
+    }
+
 
     @DisplayName("RemoveUser should delete an Vehicle when valid id is provided")
     @Test

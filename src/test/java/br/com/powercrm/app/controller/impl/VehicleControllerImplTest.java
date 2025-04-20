@@ -28,7 +28,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -187,4 +186,30 @@ class VehicleControllerImplTest {
         resultActions.andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
+    @DisplayName("PUT - handleUpdate should returns 404 when invalid id is provided")
+    @Test
+    void handleUpdateShouldReturnsNotFoundWhenInvalidIdIsProvided() throws Exception{
+        String invalidId = UUID.randomUUID().toString();
+        Mockito.doThrow(ResourceNotFoundException.class).when(vehicleService).update(invalidId, vehicleRequestDto);
+        String jsonBody = objectMapper.writeValueAsString(vehicleRequestDto);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.put("/vehicles/{id}", invalidId)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(jsonBody)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @DisplayName("PUT - handleUpdate should returns 200 when valid id is provided")
+    @Test
+    void handleUpdateShouldReturnsOkWhenValidIdIsProvided() throws Exception{
+        String validId = UUID.randomUUID().toString();
+        String jsonBody = objectMapper.writeValueAsString(vehicleRequestDto);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.put("/vehicles/{id}", validId)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(jsonBody)
+                .contentType(MediaType.APPLICATION_JSON)
+        );
+        resultActions.andExpect(MockMvcResultMatchers.status().isOk());
+    }
 }

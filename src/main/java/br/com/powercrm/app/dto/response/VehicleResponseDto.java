@@ -4,7 +4,6 @@ import br.com.powercrm.app.domain.entities.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
