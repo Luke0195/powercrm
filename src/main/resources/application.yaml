@@ -8,7 +8,11 @@ spring:
      name: app
   profiles:
      active: dev
-
+  rabbitmq:
+    username: guest
+    password: guest
+    port: 5672
+    host: localhost
   jpa:
     open-in-view: false
 springdoc:

@@ -14,7 +14,8 @@ public class VehicleFactory {
 
 
     public static VehicleRequestDto makeVehicleRequestDto(){
-        return new VehicleRequestDto("any_plate", BigDecimal.valueOf(30.000), 2015, UUID.randomUUID());
+        return new VehicleRequestDto("any_plate", BigDecimal.valueOf(30.000), 2015, UUID.randomUUID(),
+                21, 31);
     }
 
     public static Vehicle makeVehicle(VehicleRequestDto vehicleRequestDto, User user){

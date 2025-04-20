@@ -21,5 +21,43 @@ public record VehicleRequestDto(
         Integer year,
         @NotNull(message = "The field user_id must be required")
         @JsonProperty("user_id")
-        UUID userId) {
+        UUID userId,
+        @NotNull(message = "The field brand_id must be required")
+        @JsonProperty("brand_id")
+        Integer brandId,
+        @NotNull(message = "The field model_id must be required")
+        @JsonProperty("model_id")
+        Integer modelId
+        ) {
+
+
+        @Override
+        public Integer modelId() {
+                return modelId;
+        }
+
+        @Override
+        public Integer brandId() {
+                return brandId;
+        }
+
+        @Override
+        public UUID userId() {
+                return userId;
+        }
+
+        @Override
+        public Integer year() {
+                return year;
+        }
+
+        @Override
+        public BigDecimal advertisedPlate() {
+                return advertisedPlate;
+        }
+
+        @Override
+        public String plate() {
+                return plate;
+        }
 }

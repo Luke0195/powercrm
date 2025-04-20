@@ -49,6 +49,7 @@ public class VehicleValidator {
         vehicle.setPlate(vehicleRequestDto.plate());
         vehicle.setAdvertisedPlate(vehicleRequestDto.advertisedPlate());
         vehicle.getUser().setId(vehicleRequestDto.userId());
+
     }
 
 

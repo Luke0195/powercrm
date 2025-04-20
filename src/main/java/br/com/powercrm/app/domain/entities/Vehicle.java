@@ -32,6 +32,14 @@ public class Vehicle implements Serializable {
     private User user;
     @Column(name="created_at")
     private LocalDateTime createdAt;
+    @OneToOne
+    @JoinColumn(name="model_id")
+    private Model model;
+    @OneToOne
+    @JoinColumn(name="brand_id")
+    private Brand brand;
+    @Column(name="fipe_price")
+    private BigDecimal fipePrice;
 
 
     @PrePersist

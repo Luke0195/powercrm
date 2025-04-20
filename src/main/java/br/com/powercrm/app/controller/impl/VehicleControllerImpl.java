@@ -3,6 +3,7 @@ package br.com.powercrm.app.controller.impl;
 import br.com.powercrm.app.controller.VehicleController;
 import br.com.powercrm.app.dto.request.VehicleRequestDto;
 import br.com.powercrm.app.dto.response.VehicleResponseDto;
+import br.com.powercrm.app.service.RabbitNotificationService;
 import br.com.powercrm.app.service.VehicleService;
 import br.com.powercrm.app.utils.parser.ParserHelper;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +20,16 @@ import static br.com.powercrm.app.utils.http.HttpHelper.*;
 public class VehicleControllerImpl implements VehicleController {
 
     private final VehicleService vehicleService;
+    private final RabbitNotificationService rabbitNotificationService;
+
     @Override
     public ResponseEntity<VehicleResponseDto> handleAddVehicle(VehicleRequestDto vehicleRequestDto) {
-        VehicleResponseDto vehicleResponseDto = vehicleService.add(vehicleRequestDto);
-        URI uri = makeURI(vehicleResponseDto.id());
-        return created(uri, vehicleResponseDto);
+        rabbitNotificationService.validateVehicle(vehicleRequestDto, "vehicle_exchange");
+
+        //VehicleResponseDto vehicleResponseDto = vehicleService.add(vehicleRequestDto);
+       // URI uri = makeURI(vehicleResponseDto.id());
+        //return created(uri, vehicleResponseDto);
+        return null;
     }
 
     @Override
