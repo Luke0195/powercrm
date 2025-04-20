@@ -11,6 +11,7 @@ import br.com.powercrm.app.service.mapper.UserMapper;
 import br.com.powercrm.app.service.validators.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +39,7 @@ public class UserService implements AddUser, LoadUsers, RemoveUser, UpdateUser, 
 
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "users")
+    @Cacheable("users")
     public List<UserResponseDto> loadUsers() {
         List<User> users = userRepository.findAll();
         return users.stream().map(UserMapper.INSTANCE::mapToResponseDto).toList();
@@ -54,6 +55,7 @@ public class UserService implements AddUser, LoadUsers, RemoveUser, UpdateUser, 
 
     @Override
     @Transactional
+    @CacheEvict(value = "users", allEntries = true)
     public UserResponseDto update(String id, UserRequestDto userRequestDto) {
         User user=  userRepository.findById(UUID.fromString(id)).orElseThrow(() -> new ResourceNotFoundException("User with ID " + id + " was not found!"));
         userValidator.mapUserRequestDtoToUser(userRequestDto,user);
@@ -63,7 +65,7 @@ public class UserService implements AddUser, LoadUsers, RemoveUser, UpdateUser, 
 
     @Override
     @Transactional
-    @Cacheable(value = "users_by_date", key = "#start + '-' + #end")
+    @Cacheable(value = "users", key = "#start + '-' + #end")
     public List<UserResponseDto> loadUsersByPeriod(String start, String end) {
        List<User> loadUsers = userValidator.findUsersByPeriod(start, end);
        return loadUsers.stream().map(UserMapper.INSTANCE::mapToResponseDto).toList();

@@ -82,7 +82,7 @@ class VehicleServiceTest {
     @Test
     void updateVehicleShouldUpdateUserWhenValidDataIsProvided(){
         String validId = UUID.randomUUID().toString();
-        Mockito.when(vehicleValidator.verifyIfIsValidVehicleId(validId)).thenReturn(vehicle);
+        Mockito.when(vehicleValidator.verifyIfIsValidVehicleIdAndUserIdExists(validId, vehicleRequestDto)).thenReturn(vehicle);
         Mockito.when(vehicleRepository.save(Mockito.any())).thenReturn(vehicle);
         VehicleResponseDto vehicleResponseDto = vehicleService.update(validId, vehicleRequestDto);
         Assertions.assertNotNull(vehicleResponseDto);

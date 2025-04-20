@@ -29,7 +29,7 @@ public class PowerCrmExceptionHandler {
     Set<FieldErrorResponseDto> errors = getErrorsFromValidation(e);
     StandardErrorResponseDto standardErrorResponseDto = makeStandardErrorResponseDto(
             HttpHelper.getStatusCodeValue(HttpStatus.BAD_REQUEST),  HttpHelper.getPathUrlFromRequest(httpServletRequest),
-            "Hibernate Validation Exception", "Please validate the errors_field to validate the payload",
+            "Hibernate Validation Exception", "Please validate the errors_fields to validate the payload",
             errors);
     return badRequest(standardErrorResponseDto);
     }

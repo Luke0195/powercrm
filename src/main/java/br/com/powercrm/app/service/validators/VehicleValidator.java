@@ -29,9 +29,11 @@ public class VehicleValidator {
       return user;
     }
 
-    public Vehicle verifyIfIsValidVehicleId(String vehicleId){
-        return vehicleRepository.findById(UUID.fromString(vehicleId))
+    public Vehicle verifyIfIsValidVehicleIdAndUserIdExists(String vehicleId, VehicleRequestDto vehicleRequestDto){
+        Vehicle vehicle =  vehicleRepository.findById(UUID.fromString(vehicleId))
                 .orElseThrow(() -> new ResourceNotFoundException("This vehicle id does not exists"));
+        if(!userRepository.existsById(vehicleRequestDto.userId())) throw new ResourceAlreadyExistsException("This user_ id does not exists!");
+        return vehicle;
     }
 
     public Vehicle mapToEntity(VehicleRequestDto vehicleRequestDto, User user){
@@ -46,6 +48,7 @@ public class VehicleValidator {
         vehicle.setVehicleYear(vehicleRequestDto.year());
         vehicle.setPlate(vehicleRequestDto.plate());
         vehicle.setAdvertisedPlate(vehicleRequestDto.advertisedPlate());
+        vehicle.getUser().setId(vehicleRequestDto.userId());
     }
 
 

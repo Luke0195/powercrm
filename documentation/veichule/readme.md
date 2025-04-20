@@ -4,6 +4,7 @@
  * plate(required, unique)
  * advertised_price(required)
  * year(required)
+ * user_id(required)
  * createdAt
 
 > ### Casos de sucesso

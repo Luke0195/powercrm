@@ -98,8 +98,10 @@ class VehicleValidatorTest {
     void mapVehicleShouldParseVehicleRequestDtoToVehicle(){
         UUID existingId = UUID.randomUUID();
         Vehicle vehicle = new Vehicle();
+        vehicle.setUser(new User());
         VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("any_plate", BigDecimal.valueOf(30.000), 2015,existingId);
         vehicleValidator.mapVehicleRequestDtoToVehicle(vehicleRequestDto, vehicle);
+        Assertions.assertEquals(existingId, vehicle.getUser().getId());
         Assertions.assertEquals(2015, vehicle.getVehicleYear());
         Assertions.assertEquals("any_plate", vehicle.getPlate());
         Assertions.assertEquals(BigDecimal.valueOf(30.000), vehicle.getAdvertisedPlate());

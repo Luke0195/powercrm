@@ -14,6 +14,7 @@ import br.com.powercrm.app.service.mapper.VehicleMapper;
 import br.com.powercrm.app.service.validators.VehicleValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +32,7 @@ public class VehicleService implements AddVehicle, LoadVehicles, RemoveVehicle, 
 
     @Override
     @Transactional
-    @CacheEvict(value = "vehicles", allEntries = true)
+    @CachePut(value="vehicles")
     public VehicleResponseDto add(VehicleRequestDto vehicleRequestDto) {
        User user =  vehicleValidator.verifyIfIsValidPlateAndUserExists(vehicleRequestDto);
        Vehicle vehicle = setValue(vehicleRequestDto, user);
@@ -68,7 +69,7 @@ public class VehicleService implements AddVehicle, LoadVehicles, RemoveVehicle, 
     @Override
     @CacheEvict(value = "vehicles", allEntries = true)
     public VehicleResponseDto update(String id, VehicleRequestDto vehicleRequestDto) {
-        Vehicle vehicle = vehicleValidator.verifyIfIsValidVehicleId(id);
+        Vehicle vehicle = vehicleValidator.verifyIfIsValidVehicleIdAndUserIdExists(id, vehicleRequestDto);
         vehicleValidator.mapVehicleRequestDtoToVehicle(vehicleRequestDto, vehicle);
         vehicle = vehicleRepository.save(vehicle);
         return VehicleMapper.INSTANCE.mapToDto(vehicle);
