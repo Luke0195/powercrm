@@ -14,9 +14,6 @@ public record VehicleResponseDto(
         @JsonProperty("advertised_plate")
         BigDecimal advertisedPlate,
         Integer year,
-        User user,
-        VehicleStatus status,
-        @JsonProperty("created_at")
-        LocalDateTime createdAt
+        User user
         ) {
 }

@@ -2,12 +2,15 @@ package br.com.powercrm.app.service;
 
 import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.domain.entities.Vehicle;
+import br.com.powercrm.app.domain.enums.VehicleStatus;
 import br.com.powercrm.app.dto.request.VehicleRequestDto;
+import br.com.powercrm.app.dto.response.VehicleEventDto;
 import br.com.powercrm.app.dto.response.VehicleResponseDto;
 import br.com.powercrm.app.factories.UserFactory;
 import br.com.powercrm.app.factories.VehicleFactory;
 import br.com.powercrm.app.repository.VehicleRepository;
 import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
+import br.com.powercrm.app.service.producer.RabbitVehicleProducerService;
 import br.com.powercrm.app.service.validators.VehicleValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,6 +36,9 @@ class VehicleServiceTest {
 
     @Mock
     private VehicleRepository vehicleRepository;
+
+    @Mock
+    private RabbitVehicleProducerService producerService;
 
     @Mock
     private VehicleValidator vehicleValidator;
@@ -48,16 +55,15 @@ class VehicleServiceTest {
         this.vehicle = VehicleFactory.makeVehicle(vehicleRequestDto, user);
     }
 
-    @DisplayName("Add should save a vehicle when valid data is provided")
+    @DisplayName("Add should calls producerService with correct values")
     @Test
     void addShouldSaveAVehicleWhenValidDataIsProvided(){
         Mockito.when(vehicleValidator.verifyIfIsValidPlateAndUserExists(vehicleRequestDto)).thenReturn(user);
         Mockito.when(vehicleRepository.save(Mockito.any())).thenReturn(vehicle);
-        VehicleResponseDto vehicleResponseDto = vehicleService.add(vehicleRequestDto);
-        Assertions.assertNotNull(vehicleResponseDto.id());
-        Assertions.assertNotNull(vehicleResponseDto.year());
-        Assertions.assertNotNull(vehicleResponseDto.plate());
-        Assertions.assertNotNull(vehicleResponseDto.advertisedPlate());
+        vehicleService.add(vehicleRequestDto);
+        VehicleEventDto vehicleEventDto = new VehicleEventDto(UUID.randomUUID(), "HAK-1201", BigDecimal.valueOf(30.000), 2015, UUID.randomUUID(),21L, 10L);
+        Mockito.verify(producerService).sendVehicleToValidationQueue(vehicleEventDto, "any_name");
+
     }
 
     @DisplayName("LoadVehicles should returns a list on success")

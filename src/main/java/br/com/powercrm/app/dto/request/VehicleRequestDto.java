@@ -28,9 +28,7 @@ public record VehicleRequestDto(
         Long brandId,
         @NotNull(message = "The field model_id must be required")
         @JsonProperty("model_id")
-        Long modelId,
-        @JsonIgnore
-        BigDecimal fipePrice
+        Long modelId
         ) {
 
 
@@ -62,8 +60,5 @@ public record VehicleRequestDto(
                 return plate;
         }
 
-        @Override
-        public BigDecimal fipePrice() {
-                return fipePrice;
-        }
+
 }

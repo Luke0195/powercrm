@@ -10,6 +10,7 @@ import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
 import br.com.powercrm.app.service.validators.VehicleValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.ToString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,13 +44,9 @@ class VehicleControllerImplTest {
     private VehicleRequestDto vehicleRequestDto;
 
     private UUID existingId = UUID.randomUUID();
-    @Autowired
-    private VehicleValidator vehicleValidator;
 
     @MockitoBean
     private VehicleService vehicleService;
-    @Autowired
-    private UserService userService;
 
     @BeforeEach
     void setup(){
@@ -60,7 +57,7 @@ class VehicleControllerImplTest {
     @Test
     void handleAddVehicleShouldReturnsBadRequestWhenNoPlateIsProvided() throws Exception{
         VehicleRequestDto vehicleRequestDto= new VehicleRequestDto(null, BigDecimal.valueOf(30.000), 2010,
-                existingId,21, 31);
+                existingId,21L, 31L);
         String jsonBody = objectMapper.writeValueAsString(vehicleRequestDto);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post(ROUTE_NAME)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -73,7 +70,7 @@ class VehicleControllerImplTest {
     @Test
     void handleAddVehicleShouldReturnsBadRequestWhenNoAdvertisedPlateIsProvided() throws Exception{
         VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("any_plate", null, 2010,
-                existingId,21, 31);
+                existingId,21L, 31L);
         String jsonBody = objectMapper.writeValueAsString(vehicleRequestDto);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post(ROUTE_NAME)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -86,7 +83,7 @@ class VehicleControllerImplTest {
     @Test
     void handleAddVehicleShouldReturnsBadRequestWheNoYearIsProvided() throws Exception{
         VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("any_plate", BigDecimal.valueOf(30.000),
-                null, existingId,21, 31);
+                null, existingId,21L, 31L);
         String jsonBody = objectMapper.writeValueAsString(vehicleRequestDto);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post(ROUTE_NAME)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -99,7 +96,7 @@ class VehicleControllerImplTest {
     @Test
     void handleAddVehicleShouldReturnsBadRequestWheNoUserIdIsProvided() throws Exception{
         VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("any_plate", BigDecimal.valueOf(30.000),
-                2015, null, 21, 31);
+                2015, null, 21L, 31L);
         String jsonBody = objectMapper.writeValueAsString(vehicleRequestDto);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post(ROUTE_NAME)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -108,13 +105,41 @@ class VehicleControllerImplTest {
         resultActions.andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
+    @Test
+    void handleAddVehicleShouldReturnsBadRequestWhenNoBrandIIsProvided() throws Exception{
+        VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("any_plate", BigDecimal.valueOf(30.000),
+                2015, UUID.randomUUID(), null, 31L);
+        String jsonBody = objectMapper.writeValueAsString(vehicleRequestDto);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post(ROUTE_NAME)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(jsonBody));
+        resultActions.andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    void handleAddVehicleShouldReturnsBadRequestWhenNoModelIdIsProvided() throws Exception{
+        VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("any_plate", BigDecimal.valueOf(30.000),
+                2015, UUID.randomUUID(), 59L, null);
+        String jsonBody = objectMapper.writeValueAsString(vehicleRequestDto);
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post(ROUTE_NAME)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(jsonBody));
+        resultActions.andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+
+
     @DisplayName("POST - handleAddVehicle should returns 422 when vehicle plate already exists")
     @Test
     void handleAddVehicleShouldReturnsUnprocessedEntityWheNoUserPlateIsProvided() throws Exception{
         UUID idExisting = UUID.randomUUID();
         VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("HHA-1281", BigDecimal.valueOf(30.000),
-                2015, idExisting,21, 31);
-        Mockito.when(vehicleService.add(vehicleRequestDto)).thenThrow(ResourceAlreadyExistsException.class);
+                2015, idExisting,21L, 31L);
+        Mockito.doThrow(new ResourceAlreadyExistsException("Placa já cadastrada"))
+                .when(vehicleService)
+                .add(Mockito.any(VehicleRequestDto.class));
         String jsonBody = objectMapper.writeValueAsString(vehicleRequestDto);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/vehicle")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -128,8 +153,9 @@ class VehicleControllerImplTest {
     void handleAddVehicleShouldReturnsUnprocessedEntityWheAnInvalidUserIdIsProvided() throws Exception{
         UUID invalidId = UUID.randomUUID();
         VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("HHA-1281", BigDecimal.valueOf(30.000),
-                2015, invalidId,21, 31);
-        Mockito.when(vehicleService.add(vehicleRequestDto)).thenThrow(ResourceNotFoundException.class);
+                2015, invalidId,21L, 31L);
+        Mockito.doThrow(ResourceNotFoundException.class).when(vehicleService).add(vehicleRequestDto);
+
         String jsonBody = objectMapper.writeValueAsString(vehicleRequestDto);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/vehicle")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -143,10 +169,7 @@ class VehicleControllerImplTest {
     void handleAddVehicleShouldReturnsCreatedOnSuccess() throws Exception{
         UUID validId = UUID.randomUUID();
         VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("HHA-1281", BigDecimal.valueOf(30.000),
-                2015, validId, 21, 31);
-        Mockito.when(vehicleService.add(vehicleRequestDto)).thenReturn(
-                VehicleFactory.makeVehicleResponseDto(VehicleFactory.makeVehicle(vehicleRequestDto,
-                        UserFactory.makeUser(UserFactory.makeUserRequestDto()))));
+                2015, validId, 21L, 31L);
         String jsonBody = objectMapper.writeValueAsString(vehicleRequestDto);
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/vehicle")
                 .contentType(MediaType.APPLICATION_JSON)

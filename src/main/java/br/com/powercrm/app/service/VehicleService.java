@@ -47,7 +47,7 @@ public class VehicleService implements AddVehicle, LoadVehicles, RemoveVehicle, 
     public List<VehicleResponseDto> loadVehicles() {
         return vehicleRepository.findAll().stream().map(x -> new VehicleResponseDto(
                 x.getId(), x.getPlate(), x.getAdvertisedPlate(), x.getVehicleYear(),
-                x.getUser(),x.getStatus(), x.getCreatedAt())).toList();
+                x.getUser())).toList();
     }
 
     @Override
@@ -79,7 +79,7 @@ public class VehicleService implements AddVehicle, LoadVehicles, RemoveVehicle, 
     private static VehicleEventDto mapVehicleToVehicleEventDto(Vehicle vehicle, Long brandId, Long modelId){
      return   new VehicleEventDto(vehicle.getId(), vehicle.getPlate(),
                 vehicle.getAdvertisedPlate(), vehicle.getVehicleYear(), vehicle.getUser().getId(),
-                vehicle.getStatus(), vehicle.getCreatedAt(), brandId, modelId);
+                brandId, modelId);
     }
 
 }

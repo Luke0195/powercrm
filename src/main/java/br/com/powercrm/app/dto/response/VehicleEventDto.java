@@ -14,9 +14,6 @@ public record VehicleEventDto(UUID id,
                               BigDecimal advertisedPlate,
                               Integer year,
                               UUID userId,
-                              VehicleStatus status,
-                              @JsonProperty("created_at")
-                              LocalDateTime createdAt,
                               Long brandId,
                               Long modelId
                               ) {
