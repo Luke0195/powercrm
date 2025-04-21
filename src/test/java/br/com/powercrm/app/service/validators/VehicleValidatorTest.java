@@ -91,7 +91,7 @@ class VehicleValidatorTest {
     void mapToDtoShouldMapDataCorrectly(){
         VehicleResponseDto vehicleResponseDto = vehicleValidator
                 .mapToDto(VehicleFactory.makeVehicle(vehicleRequestDto, UserFactory.makeUser(UserFactory.makeUserRequestDto())));
-        Assertions.assertEquals("any_plate", vehicleResponseDto.plate());
+        Assertions.assertEquals("HAK-1313", vehicleResponseDto.plate());
         Assertions.assertEquals(2015, vehicleResponseDto.year());
         Assertions.assertEquals(BigDecimal.valueOf(30.0), vehicleResponseDto.advertisedPlate());
     }
@@ -104,12 +104,12 @@ class VehicleValidatorTest {
         vehicle.setUser(new User());
         vehicle.setBrand(new Brand());
         vehicle.setModel(new Model());
-        VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("any_plate", BigDecimal.valueOf(30.000),
+        VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("HAK-1313", BigDecimal.valueOf(30.000),
                 2015,existingId, 21L, 31L);
         vehicleValidator.mapVehicleRequestDtoToVehicle(vehicleRequestDto, vehicle);
         Assertions.assertEquals(existingId, vehicle.getUser().getId());
         Assertions.assertEquals(2015, vehicle.getVehicleYear());
-        Assertions.assertEquals("any_plate", vehicle.getPlate());
+        Assertions.assertEquals("HAK-1313", vehicle.getPlate());
         Assertions.assertEquals(BigDecimal.valueOf(30.000), vehicle.getAdvertisedPlate());
     }
 

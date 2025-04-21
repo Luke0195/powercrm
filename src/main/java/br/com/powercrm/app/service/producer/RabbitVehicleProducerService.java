@@ -1,6 +1,5 @@
 package br.com.powercrm.app.service.producer;
 
-import br.com.powercrm.app.domain.entities.Vehicle;
 import br.com.powercrm.app.dto.response.VehicleEventDto;
 import lombok.AllArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

@@ -5,6 +5,7 @@ import br.com.powercrm.app.dto.response.StandardErrorResponseDto;
 import br.com.powercrm.app.service.exceptions.InvalidParamException;
 import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;
 import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
+import br.com.powercrm.app.service.exceptions.ThirdPartyServiceException;
 import br.com.powercrm.app.utils.http.HttpHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -63,7 +64,14 @@ public class PowerCrmExceptionHandler {
         return  badRequest(standardErrorResponseDto);
     }
 
-//    @ExceptionHandler(JdbcSQLIntegrityConstraintViolationException.class)
+    @ExceptionHandler(ThirdPartyServiceException.class)
+    public ResponseEntity<StandardErrorResponseDto> handleInvalidParamException(ThirdPartyServiceException exception,
+                                                                                HttpServletRequest httpServletRequest){
+        StandardErrorResponseDto standardErrorResponseDto = makeStandardErrorResponseDto(
+                HttpHelper.getStatusCodeValue(HttpStatus.NOT_FOUND), HttpHelper.getPathUrlFromRequest(httpServletRequest),
+                "Cannot found the element!", exception.getMessage(), new HashSet<>());
+        return  badRequest(standardErrorResponseDto);
+    }
 
 
     private static Set<FieldErrorResponseDto> getErrorsFromValidation(MethodArgumentNotValidException e){

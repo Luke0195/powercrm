@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @FeignClient(name = "fipe-client", url = "https://parallelum.com.br/fipe/api/v1/carros", configuration = FeignCustomConfig.class)
-public interface FipeClient {
+public interface OpenFeignFipeClient {
 
     @GetMapping("/marcas")
     List<FipeMarcaResponse> getMarcas();

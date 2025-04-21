@@ -2,7 +2,6 @@ package br.com.powercrm.app.service;
 
 import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.domain.entities.Vehicle;
-import br.com.powercrm.app.domain.enums.VehicleStatus;
 import br.com.powercrm.app.dto.request.VehicleRequestDto;
 import br.com.powercrm.app.dto.response.VehicleEventDto;
 import br.com.powercrm.app.dto.response.VehicleResponseDto;
@@ -55,15 +54,49 @@ class VehicleServiceTest {
         this.vehicle = VehicleFactory.makeVehicle(vehicleRequestDto, user);
     }
 
-    @DisplayName("Add should calls producerService with correct values")
     @Test
-    void addShouldSaveAVehicleWhenValidDataIsProvided(){
-        Mockito.when(vehicleValidator.verifyIfIsValidPlateAndUserExists(vehicleRequestDto)).thenReturn(user);
-        Mockito.when(vehicleRepository.save(Mockito.any())).thenReturn(vehicle);
-        vehicleService.add(vehicleRequestDto);
-        VehicleEventDto vehicleEventDto = new VehicleEventDto(UUID.randomUUID(), "HAK-1201", BigDecimal.valueOf(30.000), 2015, UUID.randomUUID(),21L, 10L);
-        Mockito.verify(producerService).sendVehicleToValidationQueue(vehicleEventDto, "any_name");
+    @DisplayName("Add should throws ResourceNotFoundException when invalid userId is provided")
+    void addShouldThrowsResourceNotFoundExceptionWhenAnInvalidUserIdIsProvided(){
+      Mockito.when(vehicleValidator.verifyIfIsValidPlateAndUserExists(vehicleRequestDto)).thenThrow(ResourceNotFoundException.class);
+      Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+          vehicleService.add(vehicleRequestDto);
+      });
+    }
 
+    @Test
+    @DisplayName("Add should throws ResourceNotFoundException when invalid plate is provided")
+    void addShouldThrowsResourceNotFoundExceptionWhenAnInvalidPlateIsProvided(){
+        Mockito.when(vehicleValidator.verifyIfIsValidPlateAndUserExists(vehicleRequestDto)).thenThrow(ResourceNotFoundException.class);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+            vehicleService.add(vehicleRequestDto);
+        });
+    }
+    @Test
+    @DisplayName("Add should convert data and send to queue")
+    void addShouldConvertDataAndSendToQueue() {
+        UUID userId = UUID.randomUUID();
+        User user = User.builder().id(UUID.randomUUID()).name("JoeDoe").build();
+        VehicleRequestDto vehicleRequestDto = new VehicleRequestDto("HAK-1313", BigDecimal.valueOf(30.0),
+                2015, userId, 1L, 2L);
+        Mockito.when(vehicleValidator.verifyIfIsValidPlateAndUserExists(vehicleRequestDto)).thenReturn(user);
+        Vehicle vehicle = new Vehicle();
+        vehicle.setPlate(vehicleRequestDto.plate());
+        vehicle.setAdvertisedPlate(vehicleRequestDto.advertisedPlate());
+        vehicle.setVehicleYear(vehicleRequestDto.year());
+        vehicle.setUser(user);
+        VehicleEventDto expectedEvent = new VehicleEventDto(
+                vehicle.getId(),
+                vehicle.getPlate(),
+                vehicle.getAdvertisedPlate(),
+                vehicle.getVehicleYear(),
+                vehicle.getUser().getId(),
+                vehicleRequestDto.brandId(),
+                vehicleRequestDto.modelId()
+        );
+
+        Mockito.doNothing().when(producerService).sendVehicleToValidationQueue(expectedEvent, "vehicle_exchange");
+        vehicleService.add(vehicleRequestDto);
+        Mockito.verify(producerService).sendVehicleToValidationQueue(Mockito.eq(expectedEvent), Mockito.eq("vehicle_exchange"));
     }
 
     @DisplayName("LoadVehicles should returns a list on success")

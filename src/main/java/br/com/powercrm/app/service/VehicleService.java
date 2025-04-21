@@ -2,7 +2,6 @@ package br.com.powercrm.app.service;
 
 import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.domain.entities.Vehicle;
-import br.com.powercrm.app.domain.enums.VehicleStatus;
 import br.com.powercrm.app.domain.features.vehicle.AddVehicle;
 import br.com.powercrm.app.domain.features.vehicle.LoadVehicles;
 import br.com.powercrm.app.domain.features.vehicle.RemoveVehicle;
@@ -35,11 +34,8 @@ public class VehicleService implements AddVehicle, LoadVehicles, RemoveVehicle, 
     public void add(VehicleRequestDto vehicleRequestDto) {
        User user =  vehicleValidator.verifyIfIsValidPlateAndUserExists(vehicleRequestDto);
        Vehicle vehicle = setValue(vehicleRequestDto, user);
-
        VehicleEventDto vehicleEventDto = mapVehicleToVehicleEventDto(vehicle, vehicleRequestDto.brandId(), vehicleRequestDto.modelId());
        rabbitVehicleProducerService.sendVehicleToValidationQueue(vehicleEventDto, "vehicle_exchange");
-
-       //return VehicleMapper.INSTANCE.mapToDto(vehicle);
     }
 
     @Override

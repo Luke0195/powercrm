@@ -5,35 +5,26 @@ import br.com.powercrm.app.domain.entities.Model;
 import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.domain.entities.Vehicle;
 import br.com.powercrm.app.domain.enums.VehicleStatus;
-import br.com.powercrm.app.dto.request.VehicleRequestDto;
-import br.com.powercrm.app.dto.response.UserResponseDto;
 import br.com.powercrm.app.dto.response.VehicleEventDto;
-import br.com.powercrm.app.dto.response.VehicleResponseDto;
-import br.com.powercrm.app.external.fipe.FipeClient;
+import br.com.powercrm.app.external.fipe.OpenFeignFipeClient;
 import br.com.powercrm.app.external.fipe.dtos.*;
 import br.com.powercrm.app.repository.UserRepository;
 import br.com.powercrm.app.repository.VehicleRepository;
 import br.com.powercrm.app.service.FipeService;
-import br.com.powercrm.app.service.VehicleService;
-import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;
-import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import br.com.powercrm.app.service.exceptions.ThirdPartyServiceException;
+import br.com.powercrm.app.service.validators.FipeValidation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 
 
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
-
-import feign.FeignException.TooManyRequests;
-import org.springframework.transaction.annotation.Transactional;
 
 
 @Component
@@ -44,23 +35,20 @@ public class VehicleListener {
     private final FipeService fipeService;
     private final UserRepository userRepository;
     private final VehicleRepository vehicleRepository;
-    private final FipeClient fipeClient;
-
+    private final FipeValidation fipeValidation;
+    private final OpenFeignFipeClient openFeignFipeClient;
 
     @RabbitListener(queues = {"vehicle_creation_queue"})
     public void consumerVehicleQueue(VehicleEventDto vehicleEventDto) {
-        log.info("Iniciando processamento da mensagem para a placa: {}", vehicleEventDto.plate());
-
-        try {
-            // 1. Validar marca
-            FipeMarcaResponse marca = fipeClient.getMarcas()
+        try {// 1. Validar marca
+            FipeMarcaResponse marca = openFeignFipeClient.getMarcas()
                     .stream()
                     .filter(m -> m.getCodigo().equals(String.valueOf(vehicleEventDto.brandId())))
                     .findFirst()
                     .orElseThrow(() -> new RuntimeException("Marca não encontrada na FIPE"));
 
             // 2. Validar modelo
-            FipeModeloResponse modelo = fipeClient.getModelos(marca.getCodigo())
+            FipeModeloResponse modelo = openFeignFipeClient.getModelos(marca.getCodigo())
                     .getModelos()
                     .stream()
                     .filter(x -> x.getCodigo().equalsIgnoreCase(vehicleEventDto.modelId().toString()))
@@ -78,7 +66,7 @@ public class VehicleListener {
             log.info("Veículo encontrado na FIPE: marca={}, modelo={}, anoCodigo={}", marca.getNome(), modelo.getNome(), anoCodigo);
 
             // 4. Obter valor FIPE
-            Map<String, Object> fipeValorResponse = fipeClient.getValor(marca.getCodigo(), modelo.getCodigo(), anoCodigo);
+            Map<String, Object> fipeValorResponse = openFeignFipeClient.getValor(marca.getCodigo(), modelo.getCodigo(), anoCodigo);
             if (Objects.isNull(fipeValorResponse)) {
                 throw new RuntimeException("Erro ao obter o valor do veículo na FIPE");
             }
