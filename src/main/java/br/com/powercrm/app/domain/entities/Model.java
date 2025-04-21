@@ -15,6 +15,9 @@ import java.io.Serializable;
 public class Model implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    @Column(name = "model_code")
+    private String modelCode;
 }

@@ -1,16 +1,9 @@
 package br.com.powercrm.app.external.fipe.dtos;
 
-public record FipeAnosResponse(String codigo, String nome) {
+import lombok.Data;
 
-    @Override
-    public String codigo() {
-        return codigo;
-    }
-
-    @Override
-    public String nome() {
-        return nome;
-    }
-
-
+@Data
+public class FipeAnosResponse {
+    private String codigo;
+    private String nome;
 }

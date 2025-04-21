@@ -15,6 +15,7 @@ public interface VehicleMapper {
 
     @Mapping(target = "user.id", source ="user.id")
     @Mapping(source = "vehicleRequestDto.year", target = "vehicleYear")
+    @Mapping(target ="status", ignore = true)
     public Vehicle mapToEntity(VehicleRequestDto vehicleRequestDto, User user);
 
     @Mapping(source = "vehicle.vehicleYear", target = "year")

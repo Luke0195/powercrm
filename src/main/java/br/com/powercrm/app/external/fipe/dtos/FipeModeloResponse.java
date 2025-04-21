@@ -1,4 +1,9 @@
 package br.com.powercrm.app.external.fipe.dtos;
 
-public record FipeModeloResponse(String codigo, String nome) {
+import lombok.Data;
+
+@Data
+public class FipeModeloResponse {
+    private String codigo;
+    private String nome;
 }

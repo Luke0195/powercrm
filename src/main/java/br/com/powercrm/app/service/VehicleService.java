@@ -1,14 +1,14 @@
 package br.com.powercrm.app.service;
 
-import br.com.powercrm.app.domain.entities.Brand;
-import br.com.powercrm.app.domain.entities.Model;
 import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.domain.entities.Vehicle;
+import br.com.powercrm.app.domain.enums.VehicleStatus;
 import br.com.powercrm.app.domain.features.vehicle.AddVehicle;
 import br.com.powercrm.app.domain.features.vehicle.LoadVehicles;
 import br.com.powercrm.app.domain.features.vehicle.RemoveVehicle;
 import br.com.powercrm.app.domain.features.vehicle.UpdateVehicle;
 import br.com.powercrm.app.dto.request.VehicleRequestDto;
+import br.com.powercrm.app.dto.response.VehicleEventDto;
 import br.com.powercrm.app.dto.response.VehicleResponseDto;
 import br.com.powercrm.app.repository.VehicleRepository;
 import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
@@ -16,10 +16,7 @@ import br.com.powercrm.app.service.mapper.VehicleMapper;
 import br.com.powercrm.app.service.producer.RabbitVehicleProducerService;
 import br.com.powercrm.app.service.validators.VehicleValidator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,15 +32,14 @@ public class VehicleService implements AddVehicle, LoadVehicles, RemoveVehicle, 
     private final RabbitVehicleProducerService rabbitVehicleProducerService;
 
     @Override
-    @Transactional
-    public void validateVehicle(VehicleRequestDto vehicleRequestDto) {
+    public void add(VehicleRequestDto vehicleRequestDto) {
        User user =  vehicleValidator.verifyIfIsValidPlateAndUserExists(vehicleRequestDto);
        Vehicle vehicle = setValue(vehicleRequestDto, user);
-       vehicle.setBrand(Brand.builder().id(vehicleRequestDto.brandId()).build());
-       vehicle.setModel(Model.builder().id(vehicleRequestDto.modelId()).build());
-       rabbitVehicleProducerService.sendVehicleToValidationQueue(vehicle, "vehicle_exchange");
-       //vehicle = vehicleRepository.save(vehicle);
 
+       VehicleEventDto vehicleEventDto = mapVehicleToVehicleEventDto(vehicle, vehicleRequestDto.brandId(), vehicleRequestDto.modelId());
+       rabbitVehicleProducerService.sendVehicleToValidationQueue(vehicleEventDto, "vehicle_exchange");
+
+       //return VehicleMapper.INSTANCE.mapToDto(vehicle);
     }
 
     @Override
@@ -51,7 +47,7 @@ public class VehicleService implements AddVehicle, LoadVehicles, RemoveVehicle, 
     public List<VehicleResponseDto> loadVehicles() {
         return vehicleRepository.findAll().stream().map(x -> new VehicleResponseDto(
                 x.getId(), x.getPlate(), x.getAdvertisedPlate(), x.getVehicleYear(),
-                x.getUser(), x.getCreatedAt())).toList();
+                x.getUser(),x.getStatus(), x.getCreatedAt())).toList();
     }
 
     @Override
@@ -78,6 +74,12 @@ public class VehicleService implements AddVehicle, LoadVehicles, RemoveVehicle, 
                 .advertisedPlate(vehicleRequestDto.advertisedPlate())
                 .vehicleYear(vehicleRequestDto.year())
                 .build();
+    }
+
+    private static VehicleEventDto mapVehicleToVehicleEventDto(Vehicle vehicle, Long brandId, Long modelId){
+     return   new VehicleEventDto(vehicle.getId(), vehicle.getPlate(),
+                vehicle.getAdvertisedPlate(), vehicle.getVehicleYear(), vehicle.getUser().getId(),
+                vehicle.getStatus(), vehicle.getCreatedAt(), brandId, modelId);
     }
 
 }

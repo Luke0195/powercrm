@@ -1,6 +1,7 @@
 package br.com.powercrm.app.dto.response;
 
 import br.com.powercrm.app.domain.entities.User;
+import br.com.powercrm.app.domain.enums.VehicleStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.math.BigDecimal;
@@ -14,6 +15,8 @@ public record VehicleResponseDto(
         BigDecimal advertisedPlate,
         Integer year,
         User user,
+        VehicleStatus status,
         @JsonProperty("created_at")
-        LocalDateTime createdAt) {
+        LocalDateTime createdAt
+        ) {
 }

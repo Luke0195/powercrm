@@ -1,13 +1,22 @@
 package br.com.powercrm.app.service.consumer;
 
+import br.com.powercrm.app.domain.entities.Brand;
+import br.com.powercrm.app.domain.entities.Model;
+import br.com.powercrm.app.domain.entities.User;
+import br.com.powercrm.app.domain.entities.Vehicle;
+import br.com.powercrm.app.domain.enums.VehicleStatus;
 import br.com.powercrm.app.dto.request.VehicleRequestDto;
 import br.com.powercrm.app.dto.response.UserResponseDto;
+import br.com.powercrm.app.dto.response.VehicleEventDto;
 import br.com.powercrm.app.dto.response.VehicleResponseDto;
 import br.com.powercrm.app.external.fipe.FipeClient;
-import br.com.powercrm.app.external.fipe.dtos.FipeAnosResponse;
-import br.com.powercrm.app.external.fipe.dtos.FipeValorResponse;
+import br.com.powercrm.app.external.fipe.dtos.*;
+import br.com.powercrm.app.repository.UserRepository;
+import br.com.powercrm.app.repository.VehicleRepository;
 import br.com.powercrm.app.service.FipeService;
 import br.com.powercrm.app.service.VehicleService;
+import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;
+import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,50 +30,110 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import feign.FeignException.TooManyRequests;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.management.Notification;
 
 @Component
 @Slf4j
 @AllArgsConstructor
 public class VehicleListener {
 
+    private final FipeService fipeService;
+    private final UserRepository userRepository;
+    private final VehicleRepository vehicleRepository;
+    private final FipeClient fipeClient;
 
-     private final FipeClient fipeClient;
-     private final ObjectMapper objectMapper;
-     private final VehicleService vehicleService;
 
     @RabbitListener(queues = {"vehicle_creation_queue"})
-    public VehicleResponseDto consumerVehicleQueue(VehicleRequestDto vehicleRequestDto){
-      try{
+    public void consumerVehicleQueue(VehicleEventDto vehicleEventDto) {
+        log.info("Iniciando processamento da mensagem para a placa: {}", vehicleEventDto.plate());
 
-        System.out.println(vehicleRequestDto.brandId());
-        System.out.println(vehicleRequestDto.modelId());
-        List<FipeAnosResponse> result = fipeClient.getAnos(vehicleRequestDto.brandId().toString(), vehicleRequestDto.modelId().toString());
-        if(result.isEmpty()) throw new Exception("Validar a o seu veículo");
-        FipeAnosResponse fipeAnosResponse = result.get(0);
-        Map<String,Object> payload =  fipeClient.getValor(vehicleRequestDto.brandId().toString(), vehicleRequestDto.modelId().toString(), fipeAnosResponse.codigo());
-        BigDecimal vehiclePrice = getValue((String) payload.get("Valor"));
-        vehicleRequestDto = new VehicleRequestDto(vehicleRequestDto.plate(), vehicleRequestDto.advertisedPlate(),
-                vehicleRequestDto.year(),vehicleRequestDto.userId(),  vehicleRequestDto.brandId(), vehicleRequestDto.modelId(), vehiclePrice);
-        //return vehicleService.add(vehicleRequestDto);
+        try {
+            // 1. Validar marca
+            FipeMarcaResponse marca = fipeClient.getMarcas()
+                    .stream()
+                    .filter(m -> m.getCodigo().equals(String.valueOf(vehicleEventDto.brandId())))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Marca não encontrada na FIPE"));
 
-      }catch (Exception e){
-          e.printStackTrace();
-      }
-    return null;
+            // 2. Validar modelo
+            FipeModeloResponse modelo = fipeClient.getModelos(marca.getCodigo())
+                    .getModelos()
+                    .stream()
+                    .filter(x -> x.getCodigo().equalsIgnoreCase(vehicleEventDto.modelId().toString()))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Modelo não encontrado na FIPE"));
+
+            // 3. Validar ano
+            List<FipeAnosResponse> anos = fipeService.getAnos(marca.getCodigo(), modelo.getCodigo());
+            String anoCodigo = anos.stream()
+                    .filter(a -> a.getCodigo().startsWith(vehicleEventDto.year().toString()))
+                    .map(FipeAnosResponse::getCodigo)
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Ano não encontrado na FIPE"));
+
+            log.info("Veículo encontrado na FIPE: marca={}, modelo={}, anoCodigo={}", marca.getNome(), modelo.getNome(), anoCodigo);
+
+            // 4. Obter valor FIPE
+            Map<String, Object> fipeValorResponse = fipeClient.getValor(marca.getCodigo(), modelo.getCodigo(), anoCodigo);
+            if (Objects.isNull(fipeValorResponse)) {
+                throw new RuntimeException("Erro ao obter o valor do veículo na FIPE");
+            }
+
+            String valorFipe = ((String) fipeValorResponse.get("Valor"))
+                    .replace("R$ ", "")
+                    .replace(".", "")
+                    .replace(",", ".");
+            BigDecimal fipePrice = BigDecimal.valueOf(Double.parseDouble(valorFipe));
+
+            // 5. Buscar usuário
+            User user = userRepository.findById(vehicleEventDto.userId())
+                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+            Optional<Vehicle> vehicleAlreadyExists = vehicleRepository.findByPlate(vehicleEventDto.plate());
+
+            // 6. Verificar duplicidade da placa
+            if (vehicleAlreadyExists.isPresent()) {
+                log.warn("Placa já cadastrada: {}", vehicleAlreadyExists.get().getPlate());
+                return; // Envia para a DLQ
+            }
+
+            // 7. Montar e salvar veículo
+            Vehicle vehicle = new Vehicle();
+            vehicle.setPlate(vehicleEventDto.plate());
+            vehicle.setAdvertisedPlate(vehicleEventDto.advertisedPlate());
+            vehicle.setUser(user);
+            vehicle.setBrand(Brand.builder()
+                    .name(marca.getNome())
+                    .brandCode(marca.getCodigo())
+                    .build());
+            vehicle.setModel(Model.builder()
+                    .name(modelo.getNome())
+                    .modelCode(modelo.getCodigo())
+                    .build());
+            vehicle.setVehicleYear(vehicleEventDto.year());
+            vehicle.setStatus(VehicleStatus.VALIDATED);
+            vehicle.setFipePrice(fipePrice);
+
+            vehicleRepository.save(vehicle);
+            log.info("Veículo validado e salvo com sucesso: {}", vehicle.getPlate());
+
+        } catch (AmqpRejectAndDontRequeueException ex) {
+            // Esse é o fluxo esperado para mensagens inválidas, elas vão para DLQ
+            log.error("Erro ao processar mensagem: {}", ex.getMessage(), ex);
+            throw ex; // Apenas re-lança a exceção para garantir que a DLQ seja acionada
+        } catch (Exception e) {
+            // Se outros erros ocorrerem, você pode querer enviar para DLQ também
+            log.error("Erro ao processar mensagem da fila: {}", e.getMessage(), e);
+            throw new AmqpRejectAndDontRequeueException("Erro ao processar mensagem: " + e.getMessage(), e); // Evita reprocessamento
+        }
     }
-
-    private BigDecimal getValue(String apiPrice) throws ParseException {
-        NumberFormat numberFormat = NumberFormat.getInstance(new Locale("pt", "BR"));
-        Number number = numberFormat.parse(apiPrice.replace("R$", "").trim());
-        BigDecimal value = BigDecimal.valueOf(number.doubleValue());
-        return value;
+        private BigDecimal getValue(String apiPrice) throws ParseException {
+            NumberFormat numberFormat = NumberFormat.getInstance(new Locale("pt", "BR"));
+            Number number = numberFormat.parse(apiPrice.replace("R$", "").trim());
+            BigDecimal value = BigDecimal.valueOf(number.doubleValue());
+            return value;
+        }
     }
-}

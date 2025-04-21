@@ -5,10 +5,12 @@ import br.com.powercrm.app.dto.request.VehicleRequestDto;
 import br.com.powercrm.app.dto.response.VehicleResponseDto;
 import br.com.powercrm.app.service.producer.RabbitVehicleProducerService;
 import br.com.powercrm.app.service.VehicleService;
+import br.com.powercrm.app.utils.http.HttpHelper;
 import br.com.powercrm.app.utils.parser.ParserHelper;
 import jakarta.servlet.ServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,11 +29,12 @@ public class VehicleControllerImpl implements VehicleController {
 
     @Override
     public ResponseEntity<Map<String,Object>> handleValidateVehicle(VehicleRequestDto vehicleRequestDto) {
-        vehicleService.validateVehicle(vehicleRequestDto);
-        HashMap<String,Object> response = new HashMap<>();
-        response.put("message", "Sua solicitação de cadastro do veículo foi recebida com sucesso!" +
-                "\n O veículo passará por um processo de validação e será salvo caso todas as informações sejam confirmadas com sucesso");
-        return ResponseEntity.accepted().body(response);
+         vehicleService.add(vehicleRequestDto);
+       Map<String,Object> payload =  new HashMap<>();
+       payload.put("message", "Veículo recebido com sucesso. Seu veículo está passando pelos nossos processos de válidação.");
+       payload.put("status", "PENDING");
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(payload);
     }
 
     @Override
