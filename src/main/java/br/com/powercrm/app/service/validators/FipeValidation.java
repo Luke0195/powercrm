@@ -57,11 +57,12 @@ public class FipeValidation {
         return openFeignFipeClient.getValor(brandId, modelId, year);
     }
 
-    public BigDecimal getFipePrice(Map<String,Object> valor){
+    public BigDecimal getFipePrice(Map<String,Object> valor) {
         String valorFipe = ((String) valor.get("Valor"))
                 .replace("R$ ", "")
                 .replace(".", "")
                 .replace(",", ".");
+
         return BigDecimal.valueOf(Double.parseDouble(valorFipe));
     }
 
