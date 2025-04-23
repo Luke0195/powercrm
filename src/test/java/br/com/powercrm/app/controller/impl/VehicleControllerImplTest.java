@@ -1,16 +1,13 @@
 package br.com.powercrm.app.controller.impl;
 
+
 import br.com.powercrm.app.dto.request.VehicleRequestDto;
-import br.com.powercrm.app.factories.UserFactory;
 import br.com.powercrm.app.factories.VehicleFactory;
-import br.com.powercrm.app.service.UserService;
 import br.com.powercrm.app.service.VehicleService;
 import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;
 import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
-import br.com.powercrm.app.service.validators.VehicleValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.ToString;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -175,7 +172,7 @@ class VehicleControllerImplTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(jsonBody));
-        resultActions.andExpect(MockMvcResultMatchers.status().isCreated());
+        resultActions.andExpect(MockMvcResultMatchers.status().isAccepted());
     }
 
     @DisplayName("GET - handleLoadVehicles should returns 200 on success ")

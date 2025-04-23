@@ -38,69 +38,27 @@ public class VehicleListener {
     @RabbitListener(queues = {"vehicle_creation_queue"})
     public void consumerVehicleQueue(VehicleEventDto vehicleEventDto) {
         try {
-            FipeMarcaResponse marca = openFeignFipeClient.getMarcas()
-                    .stream()
-                    .filter(m -> m.getCodigo().equals(String.valueOf(vehicleEventDto.brandId())))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Marca não encontrada na FIPE"));
+            FipeMarcaResponse marcaFipe = fipeValidation.getMarca(vehicleEventDto.brandId());
 
-            // 2. Validar modelo
-            FipeModeloResponse modelo = openFeignFipeClient.getModelos(marca.getCodigo())
-                    .getModelos()
-                    .stream()
-                    .filter(x -> x.getCodigo().equalsIgnoreCase(vehicleEventDto.modelId().toString()))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Modelo não encontrado na FIPE"));
-
-            // 3. Validar ano
-            List<FipeAnosResponse> anos = fipeService.getAnos(marca.getCodigo(), modelo.getCodigo());
-            String anoCodigo = anos.stream()
-                    .filter(a -> a.getCodigo().startsWith(vehicleEventDto.year().toString()))
-                    .map(FipeAnosResponse::getCodigo)
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Ano não encontrado na FIPE"));
-
-            log.info("Veículo encontrado na FIPE: marca={}, modelo={}, anoCodigo={}", marca.getNome(), modelo.getNome(), anoCodigo);
-
-            // 4. Obter valor FIPE
-            Map<String, Object> fipeValorResponse = openFeignFipeClient.getValor(marca.getCodigo(), modelo.getCodigo(), anoCodigo);
+            FipeModeloResponse modeloFipe = fipeValidation.getModelo(marcaFipe.getCodigo(), vehicleEventDto.modelId());
+            List<FipeAnosResponse> anosFipe = fipeValidation.getYears(marcaFipe.getCodigo(), modeloFipe.getCodigo());
+            String anoCodigo = fipeValidation.getCodeYear(anosFipe, vehicleEventDto.year().toString());
+            Map<String, Object> fipeValorResponse = fipeValidation.getPrice(marcaFipe.getCodigo(), modeloFipe.getCodigo(), anoCodigo);
             if (Objects.isNull(fipeValorResponse)) {
                 throw new RuntimeException("Erro ao obter o valor do veículo na FIPE");
             }
+            BigDecimal fipePrice = fipeValidation.getFipePrice(fipeValorResponse);
 
-            String valorFipe = ((String) fipeValorResponse.get("Valor"))
-                    .replace("R$ ", "")
-                    .replace(".", "")
-                    .replace(",", ".");
-            BigDecimal fipePrice = BigDecimal.valueOf(Double.parseDouble(valorFipe));
-
-            // 5. Buscar usuário
             User user = userRepository.findById(vehicleEventDto.userId())
                     .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
             Optional<Vehicle> vehicleAlreadyExists = vehicleRepository.findByPlate(vehicleEventDto.plate());
 
-            // 6. Verificar duplicidade da placa
             if (vehicleAlreadyExists.isPresent()) {
                 log.warn("Placa já cadastrada: {}", vehicleAlreadyExists.get().getPlate());
                 return; // Envia para a DLQ
             }
 
-            // 7. Montar e salvar veículo
-            Vehicle vehicle = new Vehicle();
-            vehicle.setPlate(vehicleEventDto.plate());
-            vehicle.setAdvertisedPlate(vehicleEventDto.advertisedPlate());
-            vehicle.setUser(user);
-            vehicle.setBrand(Brand.builder()
-                    .name(marca.getNome())
-                    .brandCode(marca.getCodigo())
-                    .build());
-            vehicle.setModel(Model.builder()
-                    .name(modelo.getNome())
-                    .modelCode(modelo.getCodigo())
-                    .build());
-            vehicle.setVehicleYear(vehicleEventDto.year());
-            vehicle.setFipePrice(fipePrice);
-
+            Vehicle vehicle =fipeValidation.makeVehicleWithFipeValues(vehicleEventDto, user, marcaFipe, modeloFipe, fipePrice);
             vehicleRepository.save(vehicle);
             log.info("Veículo validado e salvo com sucesso: {}", vehicle.getPlate());
 
@@ -114,10 +72,5 @@ public class VehicleListener {
             throw new AmqpRejectAndDontRequeueException("Erro ao processar mensagem: " + e.getMessage(), e); // Evita reprocessamento
         }
     }
-        private BigDecimal getValue(String apiPrice) throws ParseException {
-            NumberFormat numberFormat = NumberFormat.getInstance(new Locale("pt", "BR"));
-            Number number = numberFormat.parse(apiPrice.replace("R$", "").trim());
-            BigDecimal value = BigDecimal.valueOf(number.doubleValue());
-            return value;
-        }
+
     }
