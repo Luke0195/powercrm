@@ -8,6 +8,7 @@ CREATE TABLE tb_users(
    address VARCHAR(255),
    number SMALLINT,
    complement VARCHAR(20),
+   status SMALLINT,
    created_at TIMESTAMP WITHOUT TIME ZONE
 );
 

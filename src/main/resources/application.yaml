@@ -24,3 +24,25 @@ springdoc:
 logging:
   level:
     feign: DEBUG
+
+
+vehicle:
+ queue:
+  name: vehicle_creation_queue
+ exchange:
+  name: vehicle_exchange
+ routing:
+  key: vehicle_routing_key
+
+dead:
+   letter:
+     queue:
+       name: vehicle_creation_dlq
+     exchange:
+       name: vehicle_creation_dlx_exchange
+     routing:
+       key: vehicle_dlq_routing_key
+
+retry:
+  queue:
+    name: vehicle_creation_retry_queue
