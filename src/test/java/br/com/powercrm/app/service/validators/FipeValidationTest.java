@@ -34,7 +34,7 @@ class FipeValidationTest {
     @BeforeEach
     void setup(){
         this.fipeMarcaResponse = FipeMarcaResponse.builder().codigo("1").nome("valid_name").build();
-        this.fipeModeloResponse = FipeModeloResponse.builder().codigo("valid_id").nome("valid_name").build();
+        this.fipeModeloResponse = FipeModeloResponse.builder().codigo("1").nome("valid_name").build();
         this.fipeModelosResponse = FipeModelosResponse.builder().modelos(List.of(fipeModeloResponse)).build();
         this.fipeAnosResponse = FipeAnosResponse.builder().codigo("valid_id").nome("valid_name").build();
         this.fipeValorResponse = FipeValorResponse.builder().valor("R$ 96.382,00").tipoVeiculo(1).marca("VW - VolksWagen")
@@ -64,5 +64,24 @@ class FipeValidationTest {
         FipeMarcaResponse fipeMarcaResponse = fipeValidation.getMarca(existingId);
         Assertions.assertEquals("1", fipeMarcaResponse.getCodigo());
         Assertions.assertEquals("valid_name", fipeMarcaResponse.getNome());
+    }
+
+    @DisplayName("getModelo should throws ThirdPartyExceptionWhenValidModelIdIsProvided")
+    @Test
+    void getModeloShouldThrowsThirdPartyExceptionWhenValidModelIdIsProvided(){
+        Mockito.when(openFeignFipeClient.getModelos("invalid_id")).thenThrow(ThirdPartyServiceException.class);
+        Assertions.assertThrows(ThirdPartyServiceException.class, () -> {
+            fipeValidation.getModelo("invalid_id", 1L);
+        });
+    }
+
+    @DisplayName("getModelo should return FipeModeloResponse when valid id is provided")
+    @Test
+    void getModeloShouldReturnsFipeModeloResponseWhenValidIdIsProvided(){
+        Mockito.when(openFeignFipeClient.getModelos("1")).thenReturn(fipeModelosResponse);
+        FipeModeloResponse fipeModeloResponse = fipeValidation.getModelo(fipeMarcaResponse.getCodigo(), 1L);
+        Assertions.assertNotNull(fipeModeloResponse);
+        Assertions.assertNotNull("1", fipeMarcaResponse.getCodigo());
+        Assertions.assertNotNull("valid_name", fipeMarcaResponse.getNome());
     }
 }

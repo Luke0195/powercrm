@@ -1,15 +1,12 @@
 package br.com.powercrm.app.service.consumer;
 
-import br.com.powercrm.app.domain.entities.Brand;
-import br.com.powercrm.app.domain.entities.Model;
 import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.domain.entities.Vehicle;
 import br.com.powercrm.app.dto.response.VehicleEventDto;
-import br.com.powercrm.app.external.fipe.OpenFeignFipeClient;
 import br.com.powercrm.app.external.fipe.dtos.*;
 import br.com.powercrm.app.repository.UserRepository;
 import br.com.powercrm.app.repository.VehicleRepository;
-import br.com.powercrm.app.service.FipeService;
+
 import br.com.powercrm.app.service.validators.FipeValidation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +17,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.text.ParseException;
+
 import java.util.*;
 
 @Component
@@ -29,17 +25,15 @@ import java.util.*;
 @AllArgsConstructor
 public class VehicleListener {
 
-    private final FipeService fipeService;
     private final UserRepository userRepository;
     private final VehicleRepository vehicleRepository;
     private final FipeValidation fipeValidation;
-    private final OpenFeignFipeClient openFeignFipeClient;
+
 
     @RabbitListener(queues = {"vehicle_creation_queue"})
     public void consumerVehicleQueue(VehicleEventDto vehicleEventDto) {
         try {
             FipeMarcaResponse marcaFipe = fipeValidation.getMarca(vehicleEventDto.brandId());
-
             FipeModeloResponse modeloFipe = fipeValidation.getModelo(marcaFipe.getCodigo(), vehicleEventDto.modelId());
             List<FipeAnosResponse> anosFipe = fipeValidation.getYears(marcaFipe.getCodigo(), modeloFipe.getCodigo());
             String anoCodigo = fipeValidation.getCodeYear(anosFipe, vehicleEventDto.year().toString());
