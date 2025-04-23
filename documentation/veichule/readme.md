@@ -12,8 +12,8 @@
 * [ ] Valida que os campos obrigatórios (**plate**, **advertised_price**, **year**, **user_id**) estão presentes.
 * [ ] Impede que o veículo seja cadastrado com a mesma **placa**.
 * [ ] Impede que um veículo seja cadastrado com um **user_id** inválido.
-* [ ] Adiciona um veículo quando todos os dados são válidos.
-* [ ] Retorna status **201 Created** com os dados do veículo cadastrado em caso de sucesso.
+* [ ] Envia os uma mensagem para fila de validação de dados quando os mesmo estiverem corretos.
+* [ ] Retorna uma mensagem de sucesso ao usuário, informando o mesmo que os dados do veículo informado estão sendo válidados.
 
 > #### Exceções:
 * [ ] Retorna erro **404 Not Found** se o endpoint **/api/vehicle** não for encontrado, indicando que a URL está incorreta ou foi removida.
