@@ -29,8 +29,7 @@ public class VehicleControllerImpl implements VehicleController {
          vehicleService.add(vehicleRequestDto);
        Map<String,Object> payload =  new HashMap<>();
        payload.put("message", "Veículo recebido com sucesso. Seu veículo está passando pelos nossos processos de válidação.");
-       payload.put("status", "PENDING");
-        return ResponseEntity.status(HttpStatus.CREATED)
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(payload);
     }
 
