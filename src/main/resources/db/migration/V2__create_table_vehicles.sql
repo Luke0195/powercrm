@@ -6,6 +6,5 @@ CREATE TABLE tb_vehicles(
   user_id UUID,
   created_at TIMESTAMP WITHOUT TIME ZONE,
   foreign key (user_id) references tb_users(id) ON UPDATE CASCADE ON DELETE SET NULL
-
 );
 

@@ -1,7 +1,31 @@
 services:
-  rabbitmq:
-    image: rabbitmq:3.12-management
-    restart: always
+  rabbit:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
     ports:
-      - '5672:5672'
-      - '15672:15672'
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+     RABBITMQ_DEFAULT_USER: powercrm
+     RABBITMQ_DEFAULT_PASS: powercrm
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  app:
+    container_name: powercrm_backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      rabbit:
+        condition: service_healthy  # Aguarda até o RabbitMQ passar no healthcheck
+    restart: always
+    environment:
+      SPRING_RABBITMQ_HOST: rabbit
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: powercrm
+      SPRING_RABBITMQ_PASSWORD: powercrm

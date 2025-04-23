@@ -13,6 +13,6 @@ public class RabbitVehicleProducerService {
 
 
     public void sendVehicleToValidationQueue(VehicleEventDto vehicle, String exchange){
-        rabbitTemplate.convertSendAndReceive(exchange, "vehicle_routing_key", vehicle);
+        rabbitTemplate.convertAndSend(exchange, "vehicle_routing_key", vehicle);
     }
 }

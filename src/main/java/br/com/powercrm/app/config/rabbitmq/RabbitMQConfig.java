@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfig {
-
+    /*
     private final String queueName;
     private final String exchangeName;
     private final String routingKey;
@@ -36,55 +36,65 @@ public class RabbitMQConfig {
         this.deadLetterRoutingKey = deadLetterRoutingKey;
         this.retryQueueName = retryQueueName;
     }
+    */
 
-    // Retry queue
+    public static final String QUEUE_NAME = "vehicle_creation_queue";
+    public static final String EXCHANGE_NAME = "vehicle_exchange";
+    public static final String ROUTING_KEY = "vehicle_routing_key";
+
+    // Dead letter queue (DLQ)
+    public static final String DEAD_LETTER_QUEUE_NAME = "vehicle_creation_dlq";
+    public static final String DEAD_LETTER_EXCHANGE = "vehicle_creation_dlx_exchange";
+    public static final String DEAD_LETTER_ROUTING_KEY = "vehicle_dlq_routing_key";
+
     public static final String RETRY_QUEUE_NAME = "vehicle_creation_retry_queue";
-
     @Bean
     public Queue queue() {
-        return QueueBuilder.durable(queueName)
-                .withArgument("x-dead-letter-exchange", deadLetterExchange)
-                .withArgument("x-dead-letter-routing-key", deadLetterRoutingKey) // Direciona corretamente pra DLQ
+        return QueueBuilder.durable(QUEUE_NAME)
+                .withArgument("x-dead-letter-exchange", DEAD_LETTER_EXCHANGE)
+                .withArgument("x-dead-letter-routing-key", DEAD_LETTER_ROUTING_KEY) // Direciona corretamente pra DLQ
                 .build();
     }
 
     @Bean
     public Queue deadLetterQueue() {
-        return QueueBuilder.durable(deadLetterQueueName).build();
+        return QueueBuilder.durable(DEAD_LETTER_QUEUE_NAME).build();
     }
+
 
     @Bean
     public Queue retryQueue() {
         return QueueBuilder.durable(RETRY_QUEUE_NAME)
-                .withArgument("x-message-ttl", 10000) // 10 segundos de delay
-                .withArgument("x-dead-letter-exchange", exchangeName) // Após o tempo, volta pra fila principal
-                .withArgument("x-dead-letter-routing-key", routingKey)
+                .withArgument("x-message-ttl", 10000)
+                .withArgument("x-dead-letter-exchange", EXCHANGE_NAME)
+                .withArgument("x-dead-letter-routing-key", ROUTING_KEY)
                 .build();
     }
 
+
     @Bean
     public TopicExchange exchange() {
-        return new TopicExchange(exchangeName);
+        return new TopicExchange(EXCHANGE_NAME);
     }
 
     @Bean
     public TopicExchange deadLetterExchange() {
-        return new TopicExchange(deadLetterExchange);
+        return new TopicExchange(DEAD_LETTER_EXCHANGE);
     }
 
     @Bean
     public Binding binding(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(exchangeName);
+        return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY);
     }
 
     @Bean
     public Binding dlqBinding(Queue deadLetterQueue, TopicExchange deadLetterExchange) {
-        return BindingBuilder.bind(deadLetterQueue).to(deadLetterExchange).with(deadLetterRoutingKey);
+        return BindingBuilder.bind(deadLetterQueue).to(deadLetterExchange).with(DEAD_LETTER_ROUTING_KEY);
     }
 
     @Bean
     public Binding retryBinding(Queue retryQueue, TopicExchange exchange) {
-        return BindingBuilder.bind(retryQueue).to(exchange).with(routingKey);
+        return BindingBuilder.bind(retryQueue).to(exchange).with(ROUTING_KEY);
     }
 
     @Bean

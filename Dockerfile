@@ -1,5 +1,10 @@
-FROM openjdk:17-alpine3.14
+FROM maven:3.9.6-eclipse-temurin-17 as builder
 WORKDIR /app
-COPY target/app.jar  /app/app.jar
+COPY . .
+RUN mvn clean package -DskipTests
+
+FROM eclipse-temurin:17-jdk
+WORKDIR /app
+COPY --from=builder /app/target/*.jar /app/app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

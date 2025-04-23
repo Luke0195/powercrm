@@ -38,7 +38,8 @@ public class VehicleListener {
 
     @RabbitListener(queues = {"vehicle_creation_queue"})
     public void consumerVehicleQueue(VehicleEventDto vehicleEventDto) {
-        try {// 1. Validar marca
+        try {
+            log.info("Consumindo os dados da lista");
             FipeMarcaResponse marca = openFeignFipeClient.getMarcas()
                     .stream()
                     .filter(m -> m.getCodigo().equals(String.valueOf(vehicleEventDto.brandId())))
