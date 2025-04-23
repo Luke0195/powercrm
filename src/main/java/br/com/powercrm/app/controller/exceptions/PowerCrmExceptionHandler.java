@@ -2,10 +2,7 @@ package br.com.powercrm.app.controller.exceptions;
 
 import br.com.powercrm.app.dto.response.FieldErrorResponseDto;
 import br.com.powercrm.app.dto.response.StandardErrorResponseDto;
-import br.com.powercrm.app.service.exceptions.InvalidParamException;
-import br.com.powercrm.app.service.exceptions.ResourceAlreadyExistsException;
-import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
-import br.com.powercrm.app.service.exceptions.ThirdPartyServiceException;
+import br.com.powercrm.app.service.exceptions.*;
 import br.com.powercrm.app.utils.http.HttpHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -73,6 +70,14 @@ public class PowerCrmExceptionHandler {
         return  badRequest(standardErrorResponseDto);
     }
 
+    @ExceptionHandler(ParseValidationException.class)
+    public ResponseEntity<StandardErrorResponseDto> handleEntityAlreadyExistsException(
+            ParseValidationException exception, HttpServletRequest httpServletRequest){
+        StandardErrorResponseDto standardErrorResponseDto = makeStandardErrorResponseDto(
+                HttpHelper.getStatusCodeValue(HttpStatus.BAD_REQUEST), HttpHelper.getPathUrlFromRequest(httpServletRequest),
+                "Entity already exists exception", exception.getMessage(), new HashSet<>());
+        return badRequest(standardErrorResponseDto);
+    }
 
     private static Set<FieldErrorResponseDto> getErrorsFromValidation(MethodArgumentNotValidException e){
         Set<FieldErrorResponseDto> errors = new HashSet<>();

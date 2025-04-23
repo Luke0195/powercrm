@@ -10,6 +10,7 @@ import br.com.powercrm.app.external.fipe.OpenFeignFipeClient;
 import br.com.powercrm.app.external.fipe.dtos.FipeAnosResponse;
 import br.com.powercrm.app.external.fipe.dtos.FipeMarcaResponse;
 import br.com.powercrm.app.external.fipe.dtos.FipeModeloResponse;
+import br.com.powercrm.app.service.exceptions.ParseValidationException;
 import br.com.powercrm.app.service.exceptions.ThirdPartyServiceException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Component
 @AllArgsConstructor
@@ -58,6 +60,9 @@ public class FipeValidation {
     }
 
     public BigDecimal getFipePrice(Map<String,Object> valor) {
+        if(Objects.equals((String) valor.get("valor"), "")) {
+            throw new ParseValidationException("O valor price não pode ser vazio");
+        }
         String valorFipe = ((String) valor.get("Valor"))
                 .replace("R$ ", "")
                 .replace(".", "")
@@ -67,8 +72,7 @@ public class FipeValidation {
     }
 
     public Vehicle makeVehicleWithFipeValues(VehicleEventDto vehicleEventDto, User user,
-                                             FipeMarcaResponse fipeMarcaResponse,
-                                             FipeModeloResponse fipeModeloResponse, BigDecimal fipePrice){
+                                             FipeMarcaResponse fipeMarcaResponse, BigDecimal fipePrice){
         return Vehicle.builder()
                 .plate(vehicleEventDto.plate())
                 .advertisedPlate(vehicleEventDto.advertisedPlate())
@@ -76,7 +80,6 @@ public class FipeValidation {
                 .brand(Brand.builder().name(fipeMarcaResponse.getNome()).brandCode(fipeMarcaResponse.getCodigo()).build())
                 .model(Model.builder().name(fipeMarcaResponse.getNome()).modelCode(fipeMarcaResponse.getCodigo()).build())
                 .vehicleYear(vehicleEventDto.year())
-
                 .fipePrice(fipePrice)
                 .build();
 

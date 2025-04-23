@@ -1,7 +1,12 @@
 package br.com.powercrm.app.service.validators;
 
+import br.com.powercrm.app.domain.entities.User;
+import br.com.powercrm.app.domain.entities.Vehicle;
+import br.com.powercrm.app.dto.response.VehicleEventDto;
 import br.com.powercrm.app.external.fipe.OpenFeignFipeClient;
 import br.com.powercrm.app.external.fipe.dtos.*;
+import br.com.powercrm.app.factories.ExternalFipeModelFactory;
+import br.com.powercrm.app.service.exceptions.ParseValidationException;
 import br.com.powercrm.app.service.exceptions.ThirdPartyServiceException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,12 +19,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.xml.transform.TransformerException;
-import java.util.HashMap;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+
 
 @ExtendWith(MockitoExtension.class)
 class FipeValidationTest {
@@ -37,22 +41,21 @@ class FipeValidationTest {
     private FipeModelosResponse fipeModelosResponse;
     private FipeAnosResponse fipeAnosResponse;
     private FipeValorResponse fipeValorResponse;
+    private Map<String,Object> parseFileValorResponseToMap;
+    private VehicleEventDto vehicleEventDto;
+    private User user;
+
 
 
     @BeforeEach
     void setup(){
-        this.fipeMarcaResponse = FipeMarcaResponse.builder().codigo("1").nome("valid_name").build();
-        this.fipeModeloResponse = FipeModeloResponse.builder().codigo("1").nome("valid_name").build();
-        this.fipeModelosResponse = FipeModelosResponse.builder().modelos(List.of(fipeModeloResponse)).build();
-        this.fipeAnosResponse = FipeAnosResponse.builder().codigo("2014-4").nome("2014 Diesel").build();
-        this.fipeValorResponse = FipeValorResponse.builder().valor("R$ 96.382,00").tipoVeiculo(1).marca("VW - VolksWagen")
-                .modelo("AMAROK High.CD 2.0 16V TDI 4x4 Dies. Aut")
-                .anoModelo("2014")
-                .combustivel("Diesel")
-                .codigofipe("005340-6")
-                .mesReferencia("abril de 2025")
-                .siglaCombustivel("D")
-                .build();
+        this.fipeMarcaResponse = ExternalFipeModelFactory.makeMarcaResponse();
+        this.fipeModeloResponse = ExternalFipeModelFactory.makeModeloResponse();
+        this.fipeModelosResponse = FipeModelosResponse.builder()
+                .modelos(List.of(ExternalFipeModelFactory.makeModeloResponse())).build();
+        this.fipeAnosResponse = ExternalFipeModelFactory.makeFipeAnosResponse();
+        this.fipeValorResponse = ExternalFipeModelFactory.makeFipeValorResponse();
+        this.parseFileValorResponseToMap =  ExternalFipeModelFactory.parseFipeValorResponse(fipeValorResponse);
     }
 
     @DisplayName("getMarcas should throws ThirdPartyExceptionWhenInvalidBrandIdIsProvided")
@@ -148,5 +151,30 @@ class FipeValidationTest {
                 "2014");
         Assertions.assertNotNull(payload);
         Assertions.assertEquals("R$ 96.382,00", payload.get("valor"));
+    }
+
+    @DisplayName("getFipePrice should throws ParseValidationException when invalid param is provided")
+    @Test
+    void getFipePriceShouldThrowsParseValidationExceptionWhenWhenInvalidParamIsProvided(){
+        parseFileValorResponseToMap.put("valor", "");
+        Assertions.assertThrows(ParseValidationException.class, () -> {
+            fipeValidation.getFipePrice(parseFileValorResponseToMap);
+        });
+    }
+
+    @DisplayName("getFipePrice should returns price when valid data is provided")
+    @Test
+    void getFipePriceShouldReturnsPriceWhenValidParamIsProvided(){
+        Map<String, Object> mockMap = Map.of("Valor", "R$ 96.382,00");
+        BigDecimal value = fipeValidation.getFipePrice(mockMap);
+        Assertions.assertEquals(BigDecimal.valueOf(96382.00), value);
+    }
+
+    @DisplayName("makeVehicleWithFipeValues should returns mapData when valid params are provided  ")
+    @Test
+    void makeVehicleWithFipeValuesShouldReturnsVehicleWhenValueDataIsProvided(){
+
+        Vehicle vehicle = fipeValidation.makeVehicleWithFipeValues(vehicleEventDto, user, fipeMarcaResponse, BigDecimal.valueOf(30.000));
+        Assertions.assertNotNull(vehicle);
     }
 }

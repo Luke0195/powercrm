@@ -7,6 +7,7 @@ import br.com.powercrm.app.external.fipe.dtos.*;
 import br.com.powercrm.app.repository.UserRepository;
 import br.com.powercrm.app.repository.VehicleRepository;
 
+import br.com.powercrm.app.service.exceptions.ThirdPartyServiceException;
 import br.com.powercrm.app.service.validators.FipeValidation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,15 +53,11 @@ public class VehicleListener {
                 return; // Envia para a DLQ
             }
 
-            Vehicle vehicle =fipeValidation.makeVehicleWithFipeValues(vehicleEventDto, user, marcaFipe, modeloFipe, fipePrice);
+            Vehicle vehicle =fipeValidation.makeVehicleWithFipeValues(vehicleEventDto, user, marcaFipe, fipePrice);
             vehicleRepository.save(vehicle);
             log.info("Veículo validado e salvo com sucesso: {}", vehicle.getPlate());
 
-        } catch (AmqpRejectAndDontRequeueException ex) {
-            // Esse é o fluxo esperado para mensagens inválidas, elas vão para DLQ
-            log.error("Erro ao processar mensagem: {}", ex.getMessage(), ex);
-            throw ex; // Apenas re-lança a exceção para garantir que a DLQ seja acionada
-        } catch (Exception e) {
+        } catch (AmqpRejectAndDontRequeueException e) {
             // Se outros erros ocorrerem, você pode querer enviar para DLQ também
             log.error("Erro ao processar mensagem da fila: {}", e.getMessage(), e);
             throw new AmqpRejectAndDontRequeueException("Erro ao processar mensagem: " + e.getMessage(), e); // Evita reprocessamento
