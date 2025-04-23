@@ -76,7 +76,7 @@ public class FipeValidation {
                 .brand(Brand.builder().name(fipeMarcaResponse.getNome()).brandCode(fipeMarcaResponse.getCodigo()).build())
                 .model(Model.builder().name(fipeMarcaResponse.getNome()).modelCode(fipeMarcaResponse.getCodigo()).build())
                 .vehicleYear(vehicleEventDto.year())
-                .status(VehicleStatus.VALIDATED)
+
                 .fipePrice(fipePrice)
                 .build();
 

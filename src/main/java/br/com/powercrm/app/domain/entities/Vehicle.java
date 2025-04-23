@@ -47,10 +47,6 @@ public class Vehicle implements Serializable {
     @JoinColumn(name="brand_id")
     private Brand brand;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "vehicle_status")
-    private VehicleStatus status;
-
     @Column(name="fipe_price")
     private BigDecimal fipePrice;
 

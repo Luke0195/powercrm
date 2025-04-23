@@ -101,7 +101,6 @@ public class VehicleListener {
                     .modelCode(modelo.getCodigo())
                     .build());
             vehicle.setVehicleYear(vehicleEventDto.year());
-            vehicle.setStatus(VehicleStatus.VALIDATED);
             vehicle.setFipePrice(fipePrice);
 
             vehicleRepository.save(vehicle);

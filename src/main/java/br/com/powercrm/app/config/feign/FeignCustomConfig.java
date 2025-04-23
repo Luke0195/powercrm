@@ -11,8 +11,8 @@ public class FeignCustomConfig {
     @Bean
     public RequestInterceptor requestInterceptor() {
         return requestTemplate -> {
-            String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkMzRlZjgxZi0wMmQ5LTQ0N2MtOWViZC0wOWU5ZTVhMmMyNDQiLCJlbWFpbCI6Imx1Y2FzMjAxMjczQGdtYWlsLmNvbSIsImlhdCI6MTc0NTE3NDQwNn0.3u0sLbhaAEs0e-UNF6d5OxZITobEYOg5F-P-zKdUNBY"; // Pode ser fixo ou buscar de algum serviço
-            requestTemplate.header("Authorization", "Bearer " + token);
+            //String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJkMzRlZjgxZi0wMmQ5LTQ0N2MtOWViZC0wOWU5ZTVhMmMyNDQiLCJlbWFpbCI6Imx1Y2FzMjAxMjczQGdtYWlsLmNvbSIsImlhdCI6MTc0NTE3NDQwNn0.3u0sLbhaAEs0e-UNF6d5OxZITobEYOg5F-P-zKdUNBY"; // Pode ser fixo ou buscar de algum serviço
+           // requestTemplate.header("Authorization", "Bearer " + token);
             System.out.println("🔐 Interceptando requisição: " + requestTemplate);
         };
     }
