@@ -1,6 +1,6 @@
 package br.com.powercrm.app.controller.impl;
 
-import br.com.powercrm.app.domain.enums.UserStatus;
+import br.com.powercrm.app.domain.entities.enums.UserStatus;
 import br.com.powercrm.app.dto.request.UserRequestDto;
 import br.com.powercrm.app.factories.UserFactory;
 import br.com.powercrm.app.service.UserService;

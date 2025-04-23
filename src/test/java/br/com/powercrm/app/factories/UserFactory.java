@@ -1,7 +1,7 @@
 package br.com.powercrm.app.factories;
 
 import br.com.powercrm.app.domain.entities.User;
-import br.com.powercrm.app.domain.enums.UserStatus;
+import br.com.powercrm.app.domain.entities.enums.UserStatus;
 import br.com.powercrm.app.dto.request.UserRequestDto;
 import br.com.powercrm.app.dto.response.UserResponseDto;
 

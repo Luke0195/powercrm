@@ -3,18 +3,15 @@ package br.com.powercrm.app.controller.impl;
 import br.com.powercrm.app.controller.VehicleController;
 import br.com.powercrm.app.dto.request.VehicleRequestDto;
 import br.com.powercrm.app.dto.response.VehicleResponseDto;
-import br.com.powercrm.app.service.producer.RabbitVehicleProducerService;
 import br.com.powercrm.app.service.VehicleService;
-import br.com.powercrm.app.utils.http.HttpHelper;
 import br.com.powercrm.app.utils.parser.ParserHelper;
-import jakarta.servlet.ServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

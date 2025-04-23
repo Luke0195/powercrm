@@ -5,7 +5,6 @@ import br.com.powercrm.app.domain.entities.Brand;
 import br.com.powercrm.app.domain.entities.Model;
 import br.com.powercrm.app.domain.entities.User;
 import br.com.powercrm.app.domain.entities.Vehicle;
-import br.com.powercrm.app.domain.enums.VehicleStatus;
 import br.com.powercrm.app.dto.response.VehicleEventDto;
 import br.com.powercrm.app.external.fipe.OpenFeignFipeClient;
 import br.com.powercrm.app.external.fipe.dtos.FipeAnosResponse;

@@ -1,6 +1,5 @@
 package br.com.powercrm.app.domain.entities;
 
-import br.com.powercrm.app.domain.enums.VehicleStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

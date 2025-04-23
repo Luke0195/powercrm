@@ -1,6 +1,6 @@
 package br.com.powercrm.app.dto.request;
 
-import br.com.powercrm.app.domain.enums.UserStatus;
+import br.com.powercrm.app.domain.entities.enums.UserStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;

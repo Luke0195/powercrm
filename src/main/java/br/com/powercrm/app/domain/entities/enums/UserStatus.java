@@ -1,4 +1,4 @@
-package br.com.powercrm.app.domain.enums;
+package br.com.powercrm.app.domain.entities.enums;
 
 import lombok.Getter;
 
