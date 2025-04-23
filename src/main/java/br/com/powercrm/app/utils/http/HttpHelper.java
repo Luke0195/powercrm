@@ -40,7 +40,7 @@ public class HttpHelper {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(data);
     }
 
-    public static<T> ResponseEntity<Void> noContent(){
+    public static<Void> ResponseEntity<Void> noContent(){
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 

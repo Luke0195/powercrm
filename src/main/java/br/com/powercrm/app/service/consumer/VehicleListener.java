@@ -11,7 +11,6 @@ import br.com.powercrm.app.external.fipe.dtos.*;
 import br.com.powercrm.app.repository.UserRepository;
 import br.com.powercrm.app.repository.VehicleRepository;
 import br.com.powercrm.app.service.FipeService;
-import br.com.powercrm.app.service.exceptions.ThirdPartyServiceException;
 import br.com.powercrm.app.service.validators.FipeValidation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

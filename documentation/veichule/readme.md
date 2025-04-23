@@ -26,9 +26,48 @@
 
 ---
 
+
 ### Listar Veículos
 
-> #### Casos de Sucesso:
-* [X] Recebe uma requisição do tipo **GET** na rota **/api/vehicles**.
+> ### Casos de Sucesso
+* [X] Recebe uma requisição do tipo **GET** na rota **/vehicles**.
 * [X] Retorna a lista de veículos cadastrados.
-* [X] Ret*
+* [X] Retorna **200 OK** com a lista de veículos.
+
+> ### Exceções
+* [X] Retorna **404 Not Found** se o endpoint **/vehicles** não for encontrado.
+* [X] Retorna **500 Internal Server Error** caso ocorra um erro ao carregar os vehicles.
+
+---
+
+### Atualizar Veículo
+
+> ### Casos de Sucesso
+* [X] Recebe uma requisição do tipo **PUT** na rota **/vehicles/{id}**.
+* [X] Valida se o **id** que está sendo passado na rota é válido.
+* [X] Valida se o **id** informado existe.
+* [X] Atualiza os dados do veículo caso o **id** seja válido.
+* [X] Retorna **200 OK** com os dados atualizados.
+
+> ### Exceções
+* [X] Retorna **404 Not Found** se o endpoint **/vehicles/{id}** não for encontrado.
+* [X] Retorna **404 Not Found** caso o **id** do veículo não for encontrado.
+* [X] Retorna **500 Internal Server Error** caso ocorra um erro ao atualizar o veículo.
+
+---
+
+### Deletar Veículos
+
+> ### Casos de Sucesso
+* [X] Recebe uma requisição do tipo **DELETE** na rota **/vehicles/{id}**.
+* [X] Valida se o **id** que está sendo passado na rota é válido.
+* [X] Valida se o **id** informado existe.
+* [X] Deleta a informação do usuário.
+* [X] Retorna **204 No Content** em caso de sucesso.
+
+> ### Exceções
+* [X] Retorna **404 Not Found** se o endpoint **/vehicles/{id}** não for encontrado.
+* [X] Retorna **404 Not Found** caso o **id** do veículo não for encontrado.
+* [X] Retorna **500 Internal Server Error** caso ocorra um erro ao deletar o veiculo.
+
+---
