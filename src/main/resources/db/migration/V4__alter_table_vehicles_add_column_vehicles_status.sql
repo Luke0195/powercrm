@@ -1,1 +1,0 @@
-ALTER TABLE tb_vehicles ADD COLUMN vehicle_status VARCHAR(15);
