@@ -8,11 +8,14 @@ services:
     environment:
      RABBITMQ_DEFAULT_USER: powercrm
      RABBITMQ_DEFAULT_PASS: powercrm
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"]
   app:
     container_name: powercrm_backend
     build:
@@ -21,11 +24,16 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      rabbit:
-        condition: service_healthy  # Aguarda até o RabbitMQ passar no healthcheck
+     - rabbit
+     - redis
     restart: always
     environment:
       SPRING_RABBITMQ_HOST: rabbit
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: powercrm
       SPRING_RABBITMQ_PASSWORD: powercrm
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_TIMEOUT: 60000
+volumes:
+  redis_data:

@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.util.Assert;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -56,6 +57,7 @@ class FipeValidationTest {
         this.fipeAnosResponse = ExternalFipeModelFactory.makeFipeAnosResponse();
         this.fipeValorResponse = ExternalFipeModelFactory.makeFipeValorResponse();
         this.parseFileValorResponseToMap =  ExternalFipeModelFactory.parseFipeValorResponse(fipeValorResponse);
+        this.vehicleEventDto = ExternalFipeModelFactory.makeVehicleEventDto();
     }
 
     @DisplayName("getMarcas should throws ThirdPartyExceptionWhenInvalidBrandIdIsProvided")
@@ -173,7 +175,6 @@ class FipeValidationTest {
     @DisplayName("makeVehicleWithFipeValues should returns mapData when valid params are provided  ")
     @Test
     void makeVehicleWithFipeValuesShouldReturnsVehicleWhenValueDataIsProvided(){
-
         Vehicle vehicle = fipeValidation.makeVehicleWithFipeValues(vehicleEventDto, user, fipeMarcaResponse, BigDecimal.valueOf(30.000));
         Assertions.assertNotNull(vehicle);
     }

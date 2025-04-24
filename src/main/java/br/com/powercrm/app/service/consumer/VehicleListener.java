@@ -6,8 +6,8 @@ import br.com.powercrm.app.dto.response.VehicleEventDto;
 import br.com.powercrm.app.external.fipe.dtos.*;
 import br.com.powercrm.app.repository.UserRepository;
 import br.com.powercrm.app.repository.VehicleRepository;
-
-import br.com.powercrm.app.service.exceptions.ThirdPartyServiceException;
+import br.com.powercrm.app.service.exceptions.ParseValidationException;
+import br.com.powercrm.app.service.exceptions.ResourceNotFoundException;
 import br.com.powercrm.app.service.validators.FipeValidation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,14 +38,14 @@ public class VehicleListener {
             FipeModeloResponse modeloFipe = fipeValidation.getModelo(marcaFipe.getCodigo(), vehicleEventDto.modelId());
             List<FipeAnosResponse> anosFipe = fipeValidation.getYears(marcaFipe.getCodigo(), modeloFipe.getCodigo());
             String anoCodigo = fipeValidation.getCodeYear(anosFipe, vehicleEventDto.year().toString());
-            Map<String, Object> fipeValorResponse = fipeValidation.getPrice(marcaFipe.getCodigo(), modeloFipe.getCodigo(), anoCodigo);
-            if (Objects.isNull(fipeValorResponse)) {
-                throw new RuntimeException("Erro ao obter o valor do veículo na FIPE");
-            }
+            Map<String, Object> fipeValorResponse = fipeValidation.getPrice(marcaFipe.getCodigo(),
+                    modeloFipe.getCodigo(), anoCodigo);
+            if (Objects.isNull(fipeValorResponse)) throw new ParseValidationException("Erro ao obter o valor do veículo na FIPE");
+
             BigDecimal fipePrice = fipeValidation.getFipePrice(fipeValorResponse);
 
             User user = userRepository.findById(vehicleEventDto.userId())
-                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
             Optional<Vehicle> vehicleAlreadyExists = vehicleRepository.findByPlate(vehicleEventDto.plate());
 
             if (vehicleAlreadyExists.isPresent()) {
@@ -61,6 +61,8 @@ public class VehicleListener {
             // Se outros erros ocorrerem, você pode querer enviar para DLQ também
             log.error("Erro ao processar mensagem da fila: {}", e.getMessage(), e);
             throw new AmqpRejectAndDontRequeueException("Erro ao processar mensagem: " + e.getMessage(), e); // Evita reprocessamento
+        }catch(RuntimeException e ){
+            throw new RuntimeException(e.getMessage());
         }
     }
 

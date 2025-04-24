@@ -11,6 +11,13 @@ spring:
     password: ${SPRING_RABBITMQ_PASSWORD:guest}
     port: ${SPRING_RABBITMQ_PORT:5672}
     host: ${SPRING_RABBITMQ_HOST:localhost}
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      timeout: ${SPRING_DATA_REDIS_TIMEOUT:6379}
+      sentinel:
+        username:
   jpa:
     open-in-view: false
 springdoc:
