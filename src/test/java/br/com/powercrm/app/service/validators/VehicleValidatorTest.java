@@ -21,12 +21,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.util.Assert;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
+@ActiveProfiles("dev")
 @ExtendWith(MockitoExtension.class)
 class VehicleValidatorTest {
     @Mock
