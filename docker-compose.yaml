@@ -1,39 +1,59 @@
 services:
-  rabbit:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-     RABBITMQ_DEFAULT_USER: powercrm
-     RABBITMQ_DEFAULT_PASS: powercrm
-  redis:
-    image: redis:7.2-alpine
-    container_name: redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    command: ["redis-server", "--appendonly", "yes"]
-  app:
-    container_name: powercrm_backend
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    depends_on:
-     - rabbit
-     - redis
+  postgre:
+    image: postgres:9.5
     restart: always
     environment:
-      SPRING_RABBITMQ_HOST: rabbit
-      SPRING_RABBITMQ_PORT: 5672
-      SPRING_RABBITMQ_USERNAME: powercrm
-      SPRING_RABBITMQ_PASSWORD: powercrm
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATA_REDIS_PORT: 6379
-      SPRING_DATA_REDIS_TIMEOUT: 60000
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: root
+      POSTGRES_DB: powercrm
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  rabbit:
+      image: rabbitmq:3-management
+      container_name: rabbitmq
+      ports:
+        - "5672:5672"
+        - "15672:15672"
+      environment:
+        RABBITMQ_DEFAULT_USER: powercrm
+        RABBITMQ_DEFAULT_PASS: powercrm
+  redis:
+      image: redis:7.2-alpine
+      container_name: redis
+      ports:
+        - "6379:6379"
+      volumes:
+        - redis_data:/data
+      command: [ "redis-server", "--appendonly", "yes" ]
+
+  app:
+      container_name: powercrm_backend
+      build:
+        context: .
+        dockerfile: Dockerfile
+      ports:
+        - "8080:8080"
+      depends_on:
+        - rabbit
+        - redis
+        - postgre
+      restart: always
+      environment:
+        SPRING_RABBITMQ_HOST: rabbit
+        SPRING_RABBITMQ_PORT: 5672
+        SPRING_RABBITMQ_USERNAME: powercrm
+        SPRING_RABBITMQ_PASSWORD: powercrm
+
+        SPRING_DATA_REDIS_HOST: redis
+        SPRING_DATA_REDIS_PORT: 6379
+        SPRING_DATA_REDIS_TIMEOUT: 60000
+        SPRING_DATASOURCE_URL: jdbc:postgresql://postgre:5432/powercrm
+
+        SPRING_DATASOURCE_USERNAME: root
+        SPRING_DATASOURCE_PASSWORD: root
+
 volumes:
-  redis_data:
+    redis_data:
+    postgres_data:

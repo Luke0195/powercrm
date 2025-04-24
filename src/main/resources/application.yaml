@@ -1,52 +1,69 @@
 server:
   servlet:
     context-path: /api
+
 spring:
   application:
-     name: app
-  profiles:
-     active: dev
+    name: app
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
   rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:rabbit}
+    port: ${SPRING_RABBITMQ_PORT:5672}
     username: ${SPRING_RABBITMQ_USERNAME:guest}
     password: ${SPRING_RABBITMQ_PASSWORD:guest}
-    port: ${SPRING_RABBITMQ_PORT:5672}
-    host: ${SPRING_RABBITMQ_HOST:localhost}
+
   data:
     redis:
-      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      host: ${SPRING_DATA_REDIS_HOST:redis}
       port: ${SPRING_DATA_REDIS_PORT:6379}
-      timeout: ${SPRING_DATA_REDIS_TIMEOUT:6379}
-      sentinel:
-        username:
+      timeout: ${SPRING_DATA_REDIS_TIMEOUT:60000}
+
   jpa:
-    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    out-of-order: true
+
 springdoc:
   api-docs:
     path: /v3/api-docs
   swagger-ui:
-    path:  /swagger-ui.html
+    path: /swagger-ui.html
 
 logging:
   level:
     feign: DEBUG
 
-
 vehicle:
- queue:
-  name: vehicle_creation_queue
- exchange:
-  name: vehicle_exchange
- routing:
-  key: vehicle_routing_key
+  queue:
+    name: vehicle_creation_queue
+  exchange:
+    name: vehicle_exchange
+  routing:
+    key: vehicle_routing_key
 
 dead:
-   letter:
-     queue:
-       name: vehicle_creation_dlq
-     exchange:
-       name: vehicle_creation_dlx_exchange
-     routing:
-       key: vehicle_dlq_routing_key
+  letter:
+    queue:
+      name: vehicle_creation_dlq
+    exchange:
+      name: vehicle_creation_dlx_exchange
+    routing:
+      key: vehicle_dlq_routing_key
 
 retry:
   queue:
