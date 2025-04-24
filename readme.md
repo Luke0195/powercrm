@@ -61,11 +61,12 @@ H2 Console: `http://localhost:8080/api/h2-console`
 
 ## 📄 Considerações Finais
 
-O projeto foi estruturado seguindo boas práticas de arquitetura, separação de responsabilidades e foco em código limpo e testável.
-Os prompts que foram usados no projetos estão localizados no arquivo prompts.txt
 ---
+O projeto foi estruturado seguindo boas práticas de arquitetura, separação de responsabilidades e foco em código limpo e testável.
 
 📨 Em caso de dúvidas acesse a pasta documentation para ter uma visão detalhada dos requisitos. 
+
+Os prompts que foram usados no projetos estão localizados no arquivo prompts.txt
 
 ## 🧩 Diagrama da Arquitetura
 
