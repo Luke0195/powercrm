@@ -1,0 +1,11 @@
+* Gere um arquivo de application.properties com h2-console.
+* Como configurar o cache em uma aplicação springboot.
+* Qual a diferença entre @CachePut e @CacheEvict
+* Como integrar o rabbitmq ao springboot.
+* Como repassar as variaveis do meu containers para o container da minha aplicação.
+* Como corrigir o bug da mensagem ser lida mais de uma vez?
+* Qual dos dois recursos é melhor para se realizar a requisiçoes OpenFeign ou RestTemplate?
+* Como mockar o component rabbitTemplate.
+* Como integrar o swagger a um projeto sprinboot?
+* O que posso melhorar no desenho da arquitetura desse projeto?
+* Qual a diferença de criar um docker file só com jar da aplicação para um multi-staged?

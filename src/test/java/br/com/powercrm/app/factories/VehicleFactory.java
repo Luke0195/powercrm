@@ -30,6 +30,6 @@ public class VehicleFactory {
 
     public static VehicleResponseDto makeVehicleResponseDto(Vehicle vehicle){
         return new VehicleResponseDto(vehicle.getId(), vehicle.getPlate(), vehicle.getAdvertisedPlate(),
-                vehicle.getVehicleYear(), vehicle.getUser());
+                vehicle.getVehicleYear(), vehicle.getUser(), vehicle.getBrand(), vehicle.getModel(), vehicle.getFipePrice());
     }
 }
