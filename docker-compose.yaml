@@ -17,8 +17,8 @@ services:
         - "5672:5672"
         - "15672:15672"
       environment:
-        RABBITMQ_DEFAULT_USER: powercrm
-        RABBITMQ_DEFAULT_PASS: powercrm
+        RABBITMQ_DEFAULT_USER: admin
+        RABBITMQ_DEFAULT_PASS: admin
   redis:
       image: redis:7.2-alpine
       container_name: redis
@@ -43,8 +43,8 @@ services:
       environment:
         SPRING_RABBITMQ_HOST: rabbit
         SPRING_RABBITMQ_PORT: 5672
-        SPRING_RABBITMQ_USERNAME: powercrm
-        SPRING_RABBITMQ_PASSWORD: powercrm
+        SPRING_RABBITMQ_USERNAME: admin
+        SPRING_RABBITMQ_PASSWORD: admin
 
         SPRING_DATA_REDIS_HOST: redis
         SPRING_DATA_REDIS_PORT: 6379
