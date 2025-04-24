@@ -49,8 +49,8 @@ services:
         SPRING_DATA_REDIS_HOST: redis
         SPRING_DATA_REDIS_PORT: 6379
         SPRING_DATA_REDIS_TIMEOUT: 60000
-        SPRING_DATASOURCE_URL: jdbc:postgresql://postgre:5432/powercrm
 
+        SPRING_DATASOURCE_URL: jdbc:postgresql://postgre:5432/powercrm
         SPRING_DATASOURCE_USERNAME: root
         SPRING_DATASOURCE_PASSWORD: root
 

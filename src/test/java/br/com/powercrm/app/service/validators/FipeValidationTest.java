@@ -6,6 +6,7 @@ import br.com.powercrm.app.dto.response.VehicleEventDto;
 import br.com.powercrm.app.external.fipe.OpenFeignFipeClient;
 import br.com.powercrm.app.external.fipe.dtos.*;
 import br.com.powercrm.app.factories.ExternalFipeModelFactory;
+import br.com.powercrm.app.service.FipeService;
 import br.com.powercrm.app.service.exceptions.ParseValidationException;
 import br.com.powercrm.app.service.exceptions.ThirdPartyServiceException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -31,7 +32,7 @@ import java.util.Map;
 class FipeValidationTest {
 
     @Mock
-    private OpenFeignFipeClient openFeignFipeClient;
+    private FipeService fipeService;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -75,7 +76,7 @@ class FipeValidationTest {
     void getMarcasShouldReturnsFipeMarcaResponseWhenValidBrandIdIsProvided(){
 
         Long existingId = 1L;
-        Mockito.when(openFeignFipeClient.getMarcas()).thenReturn(List.of(fipeMarcaResponse));
+        Mockito.when(fipeService.getMarcas()).thenReturn(List.of(fipeMarcaResponse));
         FipeMarcaResponse fipeMarcaResponse = fipeValidation.getMarca(existingId);
         Assertions.assertEquals("1", fipeMarcaResponse.getCodigo());
         Assertions.assertEquals("valid_name", fipeMarcaResponse.getNome());
@@ -84,7 +85,7 @@ class FipeValidationTest {
     @DisplayName("getModelo should throws ThirdPartyExceptionWhenValidModelIdIsProvided")
     @Test
     void getModeloShouldThrowsThirdPartyExceptionWhenValidModelIdIsProvided(){
-        Mockito.when(openFeignFipeClient.getModelos("invalid_id")).thenThrow(ThirdPartyServiceException.class);
+        Mockito.when(fipeService.getModelos("invalid_id")).thenThrow(ThirdPartyServiceException.class);
         Assertions.assertThrows(ThirdPartyServiceException.class, () -> {
             fipeValidation.getModelo("invalid_id", 1L);
         });
@@ -93,7 +94,7 @@ class FipeValidationTest {
     @DisplayName("getModelo should return FipeModeloResponse when valid params are provided")
     @Test
     void getModeloShouldReturnsFipeModeloResponseWhenValidIdIsProvided(){
-        Mockito.when(openFeignFipeClient.getModelos("1")).thenReturn(fipeModelosResponse);
+        Mockito.when(fipeService.getModelos("1")).thenReturn(fipeModelosResponse);
         FipeModeloResponse fipeModeloResponse = fipeValidation.getModelo(fipeMarcaResponse.getCodigo(), 1L);
         Assertions.assertNotNull(fipeModeloResponse);
         Assertions.assertNotNull("1", fipeMarcaResponse.getCodigo());
@@ -103,7 +104,7 @@ class FipeValidationTest {
     @DisplayName("getAnos should throws ThirdPartyException when invalid params are provided")
     @Test
     void getAnosShouldThrowsThirdPartyExceptionWhenInvalidParamsAreProvided(){
-        Mockito.when(openFeignFipeClient.getAnos("1L", "invalid_id")).thenThrow(ThirdPartyServiceException.class);
+        Mockito.when(fipeService.getAnos("1L", "invalid_id")).thenThrow(ThirdPartyServiceException.class);
         Assertions.assertThrows(ThirdPartyServiceException.class, () -> {
             fipeValidation.getYears("1L", "invalid_id");
         });
@@ -112,7 +113,7 @@ class FipeValidationTest {
     @DisplayName("getAnos should a returns a list of modelos when valid params are provided ")
     @Test
     void getAnosShouldAListOfModelosWhenValidParamsAreProvided(){
-        Mockito.when(openFeignFipeClient.getAnos(fipeMarcaResponse.getCodigo(), fipeModeloResponse.getCodigo())).thenReturn(List.of(fipeAnosResponse));
+        Mockito.when(fipeService.getAnos(fipeMarcaResponse.getCodigo(), fipeModeloResponse.getCodigo())).thenReturn(List.of(fipeAnosResponse));
         List<FipeAnosResponse> anosResponses = fipeValidation.getYears(fipeMarcaResponse.getCodigo(),
                 fipeModeloResponse.getCodigo());
         Assertions.assertEquals(1, anosResponses.size());
@@ -136,7 +137,7 @@ class FipeValidationTest {
     @DisplayName("getPrice should throws ThirdPartyException when invalid params are provided")
     @Test
     void getPriceShouldThrowsThirdPartyExceptionWhenInvalidParamsAreProvided(){
-        Mockito.when(openFeignFipeClient.getValor("invalid_id", "invalid_id", "2023"))
+        Mockito.when(fipeService.getValor("invalid_id", "invalid_id", "2023"))
                 .thenThrow(ThirdPartyServiceException.class);
         Assertions.assertThrows(ThirdPartyServiceException.class, () ->{
             fipeValidation.getPrice("invalid_id", "invalid_id", "2023");
@@ -148,7 +149,7 @@ class FipeValidationTest {
     void getPriceShouldReturnsResponseDataWhenValidDataIsProvided(){
         Map<String,Object> parseObject = objectMapper.convertValue(fipeValorResponse, new TypeReference<Map<String, Object>>() {
         });
-        Mockito.when(openFeignFipeClient.getValor(fipeMarcaResponse.getCodigo(), fipeModeloResponse.getCodigo(),
+        Mockito.when(fipeService.getValor(fipeMarcaResponse.getCodigo(), fipeModeloResponse.getCodigo(),
                 "2014")).thenReturn(parseObject);
         Map<String,Object> payload = fipeValidation.getPrice(fipeMarcaResponse.getCodigo(), fipeModeloResponse.getCodigo(),
                 "2014");

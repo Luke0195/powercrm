@@ -10,6 +10,7 @@ import br.com.powercrm.app.external.fipe.OpenFeignFipeClient;
 import br.com.powercrm.app.external.fipe.dtos.FipeAnosResponse;
 import br.com.powercrm.app.external.fipe.dtos.FipeMarcaResponse;
 import br.com.powercrm.app.external.fipe.dtos.FipeModeloResponse;
+import br.com.powercrm.app.service.FipeService;
 import br.com.powercrm.app.service.exceptions.ParseValidationException;
 import br.com.powercrm.app.service.exceptions.ThirdPartyServiceException;
 import lombok.AllArgsConstructor;
@@ -24,10 +25,10 @@ import java.util.Objects;
 @AllArgsConstructor
 public class FipeValidation {
 
-    private final OpenFeignFipeClient openFeignFipeClient;
+    private final FipeService fipeService;
 
     public FipeMarcaResponse getMarca(Long brandId){
-        return openFeignFipeClient.getMarcas()
+        return fipeService.getMarcas()
                 .stream()
                 .filter(m -> m.getCodigo().equals(String.valueOf(brandId)))
                 .findFirst()
@@ -35,7 +36,7 @@ public class FipeValidation {
     }
 
     public FipeModeloResponse getModelo(String brandId, Long modelId){
-     return openFeignFipeClient.getModelos(brandId)
+     return fipeService.getModelos(brandId)
                 .getModelos()
                 .stream()
                 .filter(x -> x.getCodigo().equalsIgnoreCase(modelId.toString()))
@@ -44,7 +45,7 @@ public class FipeValidation {
     }
 
     public List<FipeAnosResponse> getYears(String brandId, String modelId){
-        return openFeignFipeClient.getAnos(brandId, modelId);
+        return fipeService.getAnos(brandId, modelId);
     }
 
     public String getCodeYear(List<FipeAnosResponse> data, String year){
@@ -56,7 +57,7 @@ public class FipeValidation {
     }
 
     public Map<String, Object> getPrice(String brandId, String modelId, String year){
-        return openFeignFipeClient.getValor(brandId, modelId, year);
+        return fipeService.getValor(brandId, modelId, year);
     }
 
     public BigDecimal getFipePrice(Map<String,Object> valor) {
